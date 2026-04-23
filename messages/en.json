@@ -1,0 +1,190 @@
+{
+  "brand": {
+    "tagline": "Ride safer. Explore smarter.",
+    "privacyLink": "Privacy"
+  },
+  "citySelector": {
+    "label": "City",
+    "description": "Sofia is live in this prototype. Next-city slots are scaffolded for future betas.",
+    "live": "Live now",
+    "planned": "Next up",
+    "sofia": "Sofia",
+    "plovdiv": "Plovdiv",
+    "varna": "Varna"
+  },
+  "home": {
+    "eyebrow": "Sofia's living map for cyclists",
+    "title": "Ride calmer. Explore smarter.",
+    "subtitle": "A local-first prototype for safer routing, useful stops, themed rides and lightweight meetup coordination without turning into a noisy social app.",
+    "prototypeBadge": "PWA prototype",
+    "rideMode": "Ride Mode",
+    "exploreMode": "Explore Mode",
+    "reportsOverlay": "Live reports",
+    "meetupOverlay": "Meetup pin",
+    "reportTitle": "Quick report",
+    "reportSubtitle": "Structured reports keep the map useful, fast and easier to moderate.",
+    "notePlaceholder": "Example: parked car blocks the lane, pass only on the sidewalk...",
+    "submitReport": "Save locally",
+    "savingReport": "Saving...",
+    "savedReport": "Saved on device",
+    "reportSafetyNote": "Community reports can go stale. Double-check real conditions before you ride through.",
+    "meetupSafetyNote": "Meet in public places and share personal contact details only if you want to.",
+    "themeRailTitle": "Routes with character",
+    "join": "Join",
+    "maybe": "Maybe",
+    "share": "Share",
+    "meetupActions": {
+      "joined": "You are in for this ride.",
+      "maybe": "Saved as maybe for now.",
+      "shared": "Meetup link copied.",
+      "shareUnavailable": "Copy the page URL manually on this device."
+    },
+    "reportLocation": {
+      "precise": "Report will use your current location when permission is available.",
+      "fallback": "GPS was approximate or unavailable, so the report used the Sofia fallback pin.",
+      "blocked": "Location permission was blocked, so the report used the Sofia fallback pin."
+    },
+    "tabs": {
+      "dashboard": "Dashboard",
+      "routes": "Routes",
+      "social": "Social"
+    },
+    "quickSignalsTitle": "Quick signals",
+    "quickSignalsSubtitle": "Recent rider reports around the current map view.",
+    "weekly": {
+      "title": "Weekly pulse",
+      "badge": "This week",
+      "subtitle": "A lightweight dashboard for streaks, calm kilometers and map contribution.",
+      "streak": "Streak",
+      "rides": "Rides",
+      "calmKm": "Calm km"
+    },
+    "lastRide": {
+      "title": "Repeat last route",
+      "subtitle": "Jump back into the current route profile or open the routes tab for more choices.",
+      "repeat": "Repeat route",
+      "openRoutes": "Open routes"
+    },
+    "dashboardActionsTitle": "Next move",
+    "dashboardActionsSubtitle": "Keep the dashboard map clean, then jump into route planning or social coordination when you need it.",
+    "routePlanner": {
+      "title": "Routes tab",
+      "subtitle": "Use this tab as the route desk. Later we plug real safe, balanced and fast routing in here.",
+      "primary": "Back to dashboard",
+      "secondary": "Open social"
+    },
+    "socialHub": {
+      "title": "Social tab",
+      "subtitle": "Meetups, quick reports and bike + transit tips live here so the main dashboard stays calmer.",
+      "reports": "Reports",
+      "meetups": "Meetups",
+      "transit": "Transit",
+      "openSocial": "Open social"
+    },
+    "transit": {
+      "title": "Bike + transit helper",
+      "badge": "Operator note",
+      "intro": "A conservative helper for mixing cycling with public transport. Treat it as practical guidance and re-check the operator page before a ride.",
+      "metroTitle": "Metro",
+      "metroRule": "Use the last carriage. Weekdays: before 07:00 and after 20:00. Weekends and public holidays: all day.",
+      "surfaceTitle": "Tram and bus",
+      "surfaceRule": "Use the last door only when there is enough room, the vehicle is not crowded and your bike stays clear of other passengers.",
+      "etiquetteTitle": "Rider etiquette",
+      "etiquetteItems": [
+        "Keep the bike clean and hold it steady while boarding.",
+        "Do not block wheelchairs, strollers, exits or the main aisle.",
+        "If the vehicle is full, wait for the next one instead of forcing space."
+      ]
+    },
+    "stats": {
+      "saferSegments": "Safer segments",
+      "liveSignals": "Live signals",
+      "themedRoutes": "Themed rides"
+    },
+    "meetups": {
+      "southParkRide": "After-work South Park ride",
+      "meetupNote": "The exact meeting pin appears after approval. Instagram or Telegram reveal should stay optional and mutual."
+    }
+  },
+  "reportTypes": {
+    "blockedLane": "Blocked lane",
+    "tramDanger": "Tram danger",
+    "construction": "Construction",
+    "goodParking": "Good parking",
+    "quietShortcut": "Quiet shortcut",
+    "beerSnack": "Beer + snack",
+    "shkembeStop": "Shkembe stop"
+  },
+  "routeThemes": {
+    "safeCommute": "Safe commute",
+    "historicalRoute": "Historical route",
+    "beerSnack": "Beer + snack",
+    "shkembeRoute": "Shkembe route",
+    "shadeRoute": "Shade route"
+  },
+  "mapStatus": {
+    "loading": "Loading official layer",
+    "live": "Official layer live",
+    "cached": "Using cached layer",
+    "unavailable": "Official layer unavailable",
+    "online": "Online now",
+    "offline": "Offline now",
+    "waiting": "Waiting for data",
+    "updatedMinutes": "Updated {minutes}m ago"
+  },
+  "installPrompt": {
+    "title": "Install Bike Sofia",
+    "body": "Keep the map one tap away and reuse your local reports and cached bike layer faster.",
+    "install": "Install",
+    "later": "Later"
+  },
+  "legal": {
+    "title": "Before you use Bike Sofia",
+    "subtitle": "This MVP mixes routing hints, community reports and optional meetup coordination. Use it carefully in the real world.",
+    "badge": "MVP terms",
+    "adult": "I am 18+ and use the social/meetup features at my own responsibility.",
+    "meetup": "I understand Bike Sofia is not responsible for in-person meetings or people I choose to meet.",
+    "navigation": "I understand routes and reports are guidance only and I must judge road, traffic and safety conditions myself.",
+    "note": "For the hosted beta we should replace this with proper lawyer-reviewed Terms, Privacy and community rules.",
+    "accept": "Accept and continue",
+    "learnMore": "Read privacy note"
+  },
+  "misc": {
+    "cityPulse": "City pulse",
+    "routePreview": "Route preview",
+    "freshSignals": "Fresh signals",
+    "officialLayer": "Official bike layer",
+    "gpsReady": "GPS ready",
+    "gpsLocating": "Locating...",
+    "gpsActive": "GPS active",
+    "gpsBlocked": "GPS blocked",
+    "gpsUnsupported": "GPS unavailable",
+    "transitBeta": "Transit helper",
+    "fullMap": "Full map",
+    "backToSplit": "Back",
+    "safety": "Safety",
+    "distance": "Distance",
+    "elevation": "Elevation",
+    "when": "When",
+    "pace": "Pace",
+    "people": "People",
+    "critical": "Critical",
+    "important": "Important",
+    "positive": "Positive",
+    "fastestUseful": "Strong everyday choice",
+    "cityStories": "Central Sofia, layered history and calmer pauses",
+    "afterRide": "Finish with drinks, snacks and bike parking nearby",
+    "lateNightRecovery": "Late-night loop with a shkembe chorba ending",
+    "summerEscape": "Cooler, greener profile for hot days",
+    "lowStress": "Low stress",
+    "balanced": "Balanced",
+    "chill": "Chill",
+    "funRoute": "Fun",
+    "coolerRide": "Cooler ride",
+    "unlistedLink": "Unlisted link",
+    "todayAt1930": "Today, 19:30",
+    "steadySocial": "Steady social pace"
+    ,
+    "beta": "Beta"
+  }
+}

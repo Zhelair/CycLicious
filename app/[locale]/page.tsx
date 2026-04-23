@@ -1,0 +1,141 @@
+import {getTranslations, setRequestLocale} from "next-intl/server";
+
+import {AppShell} from "../../components/app-shell";
+import {featuredMeetup} from "../../lib/data/meetups";
+import {reportPresets} from "../../lib/data/report-presets";
+import {communityReports} from "../../lib/data/reports";
+import {routeThemes} from "../../lib/data/themes";
+import type {Locale} from "../../lib/i18n/config";
+
+export default async function LocaleHomePage({
+  params
+}: {
+  params: Promise<{locale: Locale}>;
+}) {
+  const {locale} = await params;
+  setRequestLocale(locale);
+
+  const t = await getTranslations("home");
+  const reportT = await getTranslations("reportTypes");
+  const themeT = await getTranslations("routeThemes");
+  const miscT = await getTranslations("misc");
+
+  return (
+    <AppShell
+      hero={{
+        eyebrow: t("eyebrow"),
+        title: t("title"),
+        subtitle: t("subtitle")
+      }}
+      stats={[
+        {label: t("stats.saferSegments"), value: "214"},
+        {label: t("stats.liveSignals"), value: "38"},
+        {label: t("stats.themedRoutes"), value: "12"}
+      ]}
+      metaLabels={{
+        prototype: t("prototypeBadge"),
+        cityPulse: miscT("cityPulse"),
+        routePreview: miscT("routePreview"),
+        freshSignals: miscT("freshSignals"),
+        officialLayer: miscT("officialLayer"),
+        gpsReady: miscT("gpsReady"),
+        gpsLocating: miscT("gpsLocating"),
+        gpsActive: miscT("gpsActive"),
+        gpsBlocked: miscT("gpsBlocked"),
+        gpsUnsupported: miscT("gpsUnsupported"),
+        transitBeta: miscT("transitBeta"),
+        fullMap: miscT("fullMap"),
+        backToSplit: miscT("backToSplit"),
+        safety: miscT("safety"),
+        distance: miscT("distance"),
+        elevation: miscT("elevation"),
+        when: miscT("when"),
+        pace: miscT("pace"),
+        people: miscT("people")
+      }}
+      labels={{
+        rideMode: t("rideMode"),
+        exploreMode: t("exploreMode"),
+        reports: t("reportsOverlay"),
+        meetup: t("meetupOverlay"),
+        meetupJoined: t("meetupActions.joined"),
+        meetupMaybe: t("meetupActions.maybe"),
+        meetupShared: t("meetupActions.shared"),
+        meetupShareUnavailable: t("meetupActions.shareUnavailable"),
+        locationPrecise: t("reportLocation.precise"),
+        locationFallback: t("reportLocation.fallback"),
+        locationBlocked: t("reportLocation.blocked")
+      }}
+      reportForm={{
+        title: t("reportTitle"),
+        subtitle: t("reportSubtitle"),
+        notePlaceholder: t("notePlaceholder"),
+        submitLabel: t("submitReport"),
+        savingLabel: t("savingReport"),
+        savedLabel: t("savedReport"),
+        safetyNote: t("reportSafetyNote"),
+        chipOptions: reportPresets
+          .filter((preset) =>
+            [
+              "blockedLane",
+              "tramDanger",
+              "construction",
+              "goodParking",
+              "beerSnack",
+              "shkembeStop"
+            ].includes(preset.id)
+          )
+          .map((preset) => ({
+            id: preset.id,
+            label: reportT(preset.titleKey),
+            severity: preset.severity,
+            categoryKey: preset.categoryKey
+          }))
+      }}
+      meetup={{
+        title: t(`meetups.${featuredMeetup.titleKey}`),
+        visibility: miscT(featuredMeetup.visibilityKey),
+        when: miscT(featuredMeetup.whenKey),
+        pace: miscT(featuredMeetup.paceKey),
+        attendees: featuredMeetup.attendees,
+        note: t(`meetups.${featuredMeetup.noteKey}`),
+        safetyNote: t("meetupSafetyNote"),
+        joinLabel: t("join"),
+        maybeLabel: t("maybe"),
+        shareLabel: t("share"),
+        coordinates: featuredMeetup.coordinates
+      }}
+      transit={{
+        title: t("transit.title"),
+        badge: t("transit.badge"),
+        intro: t("transit.intro"),
+        metroTitle: t("transit.metroTitle"),
+        metroRule: t("transit.metroRule"),
+        surfaceTitle: t("transit.surfaceTitle"),
+        surfaceRule: t("transit.surfaceRule"),
+        etiquetteTitle: t("transit.etiquetteTitle"),
+        etiquetteItems: [
+          t("transit.etiquetteItems.0"),
+          t("transit.etiquetteItems.1"),
+          t("transit.etiquetteItems.2")
+        ]
+      }}
+      themesLabel={t("themeRailTitle")}
+      themeCards={routeThemes.map((theme) => ({
+        id: theme.id,
+        title: themeT(theme.labelKey),
+        vibe: miscT(theme.vibeKey),
+        safety: miscT(theme.safetyKey),
+        distanceKm: theme.distanceKm,
+        elevationM: theme.elevationM,
+        accent: theme.accent,
+        previewPath: theme.previewPath
+      }))}
+      reports={communityReports.map((report) => ({
+        ...report,
+        title: reportT(report.titleKey),
+        category: miscT(report.categoryKey)
+      }))}
+    />
+  );
+}
