@@ -25,7 +25,13 @@ type ReportComposerProps = {
     severity: ReportSeverity;
     categoryKey: ReportCategoryKey;
   }[];
+  onCreateSharedReport?: (payload: {
+    reportTypeKey: ReportTypeKey;
+    note: string;
+    coordinates: [number, number];
+  }) => Promise<boolean>;
   onCreateLocalReport: (report: LocalReportRecord) => void;
+  onRemoveLocalReport?: (id: string) => void;
 };
 
 export function ReportComposer({
@@ -38,7 +44,10 @@ export function ReportComposer({
   safetyNote,
   locationLabels,
   chipOptions,
+  onCreateSharedReport,
   onCreateLocalReport
+  ,
+  onRemoveLocalReport
 }: ReportComposerProps) {
   const [activeChipId, setActiveChipId] = useState<ReportTypeKey>(
     chipOptions[0]?.id ?? "blockedLane"
@@ -186,6 +195,18 @@ export function ReportComposer({
           : locationLabels.fallback
     );
     onCreateLocalReport(localReport);
+
+    const sharedSaved = await onCreateSharedReport?.({
+      reportTypeKey: activeChip.id,
+      note: note.trim(),
+      coordinates
+    });
+
+    if (sharedSaved) {
+      await appDb.localReports.delete(localReport.id);
+      onRemoveLocalReport?.(localReport.id);
+    }
+
     window.setTimeout(() => setSubmitState("idle"), 1800);
   }
 

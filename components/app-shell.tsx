@@ -13,6 +13,7 @@ import {TransitRulesCard} from "./transit-rules-card";
 import {LegalConsentGate} from "./legal-consent-gate";
 import type {ReportCategoryKey, ReportTypeKey} from "../lib/data/report-presets";
 import type {ReportSeverity} from "../lib/data/reports";
+import {normalizeSharedReport, type SharedReportRecord} from "../lib/supabase/reports";
 
 type AppTab = "dashboard" | "routes" | "social";
 
@@ -140,6 +141,8 @@ export function AppShell({
   const [activeTab, setActiveTab] = useState<AppTab>("dashboard");
   const [selectedThemeId, setSelectedThemeId] = useState(themeCards[0]?.id ?? "");
   const [localReports, setLocalReports] = useState<LocalReportRecord[]>([]);
+  const [sharedReports, setSharedReports] = useState<SharedReportRecord[]>([]);
+  const [hasLoadedSharedReports, setHasLoadedSharedReports] = useState(false);
   const [mapWindowMode, setMapWindowMode] = useState<"split" | "focus">("split");
   const [preferencesReady, setPreferencesReady] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
@@ -273,6 +276,37 @@ export function AppShell({
   }, []);
 
   useEffect(() => {
+    let isCancelled = false;
+
+    const loadSharedReports = async () => {
+      try {
+        const response = await fetch("/api/reports", {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as {data?: SharedReportRecord[]};
+
+        if (!isCancelled && Array.isArray(payload.data)) {
+          setSharedReports(payload.data);
+          setHasLoadedSharedReports(true);
+        }
+      } catch {
+        // Keep seeded reports when the shared backend is not configured yet.
+      }
+    };
+
+    void loadSharedReports();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const syncTime = () => {
       setCurrentTime(Date.now());
     };
@@ -285,6 +319,18 @@ export function AppShell({
 
   const selectedTheme =
     themeCards.find((theme) => theme.id === selectedThemeId) ?? themeCards[0];
+  const seededOrSharedReports = hasLoadedSharedReports
+    ? sharedReports.map(normalizeSharedReport).map((report) => ({
+        id: report.id,
+        title: reportT(report.reportTypeKey),
+        category: miscT(report.categoryKey),
+        severity: report.severity,
+        ageMinutes: report.ageMinutes,
+        confirmations: report.confirmations,
+        coordinates: report.coordinates
+      }))
+    : reports;
+
   const mergedReports = [
     ...localReports.map((report) => ({
       id: report.id,
@@ -298,7 +344,7 @@ export function AppShell({
       confirmations: report.confirmations,
       coordinates: report.coordinates
     })),
-    ...reports
+    ...seededOrSharedReports
   ];
   const pulseReports = mergedReports.slice(0, 4);
   const weeklyStats = [
@@ -449,11 +495,45 @@ export function AppShell({
                 fallback: labels.locationFallback,
                 blocked: labels.locationBlocked
               }}
+              onCreateSharedReport={async ({reportTypeKey, note, coordinates}) => {
+                try {
+                  const response = await fetch("/api/reports", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                      reportTypeKey,
+                      note,
+                      coordinates
+                    })
+                  });
+
+                  if (!response.ok) {
+                    return false;
+                  }
+
+                  const payload = (await response.json()) as {data?: SharedReportRecord};
+
+                  if (!payload.data) {
+                    return false;
+                  }
+
+                  setHasLoadedSharedReports(true);
+                  setSharedReports((current) => [payload.data!, ...current]);
+                  return true;
+                } catch {
+                  return false;
+                }
+              }}
               onCreateLocalReport={(report) => {
                 setLocalReports((current) => [
                   report,
                   ...current.filter((entry) => entry.id !== report.id)
                 ]);
+              }}
+              onRemoveLocalReport={(reportId) => {
+                setLocalReports((current) => current.filter((entry) => entry.id !== reportId));
               }}
             />
             <section className="panel-card shell-card">

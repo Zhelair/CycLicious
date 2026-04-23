@@ -21,7 +21,7 @@ create table if not exists public.consents (
 
 create table if not exists public.reports (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
   city_slug text not null default 'sofia',
   report_type text not null,
   category_key text not null,
