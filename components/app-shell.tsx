@@ -369,89 +369,6 @@ export function AppShell({
           onClick={() => setMapWindowMode("split")}
         />
       ) : null}
-      <section className="hero-grid">
-        <section className="hero-panel shell-card">
-          <div className="hero-toolbar">
-            <span className="prototype-pill">{metaLabels.prototype}</span>
-            <ModeToggle
-              rideLabel={labels.rideMode}
-              exploreLabel={labels.exploreMode}
-              value={mode}
-              onChange={setMode}
-            />
-          </div>
-          <div className="hero-copy">
-            <p className="eyebrow">{hero.eyebrow}</p>
-            <h1>{hero.title}</h1>
-            <p className="hero-subtitle">{hero.subtitle}</p>
-          </div>
-          <section className="stat-ribbon">
-            {stats.map((stat) => (
-              <article className="stat-card" key={stat.label}>
-                <span>{stat.label}</span>
-                <strong>{stat.value}</strong>
-              </article>
-            ))}
-          </section>
-        </section>
-
-        <div className="hero-stack">
-          <section className="panel-card shell-card hero-summary-card">
-            <div className="panel-header">
-              <h2>{homeT("weekly.title")}</h2>
-              <span className="status-chip accent-chip">{homeT("weekly.badge")}</span>
-            </div>
-            <p className="summary-copy">{homeT("weekly.subtitle")}</p>
-            <div className="summary-metrics">
-              {weeklyStats.map((stat) => (
-                <article className="summary-stat" key={stat.label}>
-                  <span>{stat.label}</span>
-                  <strong>{stat.value}</strong>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="panel-card shell-card hero-summary-card">
-            <div className="panel-header">
-              <h2>{homeT("lastRide.title")}</h2>
-              <span className="status-chip">{selectedTheme.title}</span>
-            </div>
-            <p className="summary-copy">{homeT("lastRide.subtitle")}</p>
-            <div className="summary-metrics route-summary-metrics">
-              <article className="summary-stat">
-                <span>{metaLabels.safety}</span>
-                <strong>{selectedTheme.safety}</strong>
-              </article>
-              <article className="summary-stat">
-                <span>{metaLabels.distance}</span>
-                <strong>{selectedTheme.distanceKm} km</strong>
-              </article>
-              <article className="summary-stat">
-                <span>{metaLabels.elevation}</span>
-                <strong>{selectedTheme.elevationM} m</strong>
-              </article>
-            </div>
-            <div className="button-row">
-              <button
-                className="primary-button"
-                type="button"
-                onClick={() => setActiveTab("routes")}
-              >
-                {homeT("lastRide.repeat")}
-              </button>
-              <button
-                className="secondary-button"
-                type="button"
-                onClick={() => setActiveTab("routes")}
-              >
-                {homeT("lastRide.openRoutes")}
-              </button>
-            </div>
-          </section>
-        </div>
-      </section>
-
       <nav className="section-tabs shell-card" aria-label={homeT("tabs.dashboard")}>
         {([
           {id: "dashboard", label: homeT("tabs.dashboard")},
@@ -470,118 +387,207 @@ export function AppShell({
       </nav>
 
       {activeTab === "dashboard" ? (
-        <section className={`dashboard-grid tab-panel-grid ${mapIsFocused ? "map-focused" : ""}`}>
-          <MapStage
-            expanded={mapIsFocused}
-            featuredReports={pulseReports}
-            labels={labels}
-            metaLabels={metaLabels}
-            meetup={meetup}
-            mode={mode}
-            onOpenRoutes={() => setActiveTab("routes")}
-            onOpenSocial={() => setActiveTab("social")}
-            onToggleExpanded={() =>
-              setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
-            }
-            reports={mergedReports}
-            theme={selectedTheme}
-          />
-
-          <div className="dashboard-sidebar">
-            <ReportComposer
-              {...reportForm}
-              locationLabels={{
-                precise: labels.locationPrecise,
-                fallback: labels.locationFallback,
-                blocked: labels.locationBlocked
-              }}
-              onCreateSharedReport={async ({reportTypeKey, note, coordinates}) => {
-                try {
-                  const response = await fetch("/api/reports", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                      reportTypeKey,
-                      note,
-                      coordinates
-                    })
-                  });
-
-                  if (!response.ok) {
-                    return false;
-                  }
-
-                  const payload = (await response.json()) as {data?: SharedReportRecord};
-
-                  if (!payload.data) {
-                    return false;
-                  }
-
-                  setHasLoadedSharedReports(true);
-                  setSharedReports((current) => [payload.data!, ...current]);
-                  return true;
-                } catch {
-                  return false;
-                }
-              }}
-              onCreateLocalReport={(report) => {
-                setLocalReports((current) => [
-                  report,
-                  ...current.filter((entry) => entry.id !== report.id)
-                ]);
-              }}
-              onRemoveLocalReport={(reportId) => {
-                setLocalReports((current) => current.filter((entry) => entry.id !== reportId));
-              }}
+        <>
+          <section
+            className={`dashboard-grid tab-panel-grid dashboard-primary-grid ${
+              mapIsFocused ? "map-focused" : ""
+            }`}
+          >
+            <MapStage
+              expanded={mapIsFocused}
+              featuredReports={pulseReports}
+              labels={labels}
+              metaLabels={metaLabels}
+              meetup={meetup}
+              mode={mode}
+              onOpenRoutes={() => setActiveTab("routes")}
+              onOpenSocial={() => setActiveTab("social")}
+              onToggleExpanded={() =>
+                setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
+              }
+              reports={mergedReports}
+              theme={selectedTheme}
             />
-            <section className="panel-card shell-card">
-              <div className="panel-header">
-                <h2>{homeT("quickSignalsTitle")}</h2>
-                <p>{homeT("quickSignalsSubtitle")}</p>
+
+            <div className="dashboard-sidebar">
+              <ReportComposer
+                {...reportForm}
+                locationLabels={{
+                  precise: labels.locationPrecise,
+                  fallback: labels.locationFallback,
+                  blocked: labels.locationBlocked
+                }}
+                onCreateSharedReport={async ({reportTypeKey, note, coordinates}) => {
+                  try {
+                    const response = await fetch("/api/reports", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                        reportTypeKey,
+                        note,
+                        coordinates
+                      })
+                    });
+
+                    if (!response.ok) {
+                      return false;
+                    }
+
+                    const payload = (await response.json()) as {data?: SharedReportRecord};
+
+                    if (!payload.data) {
+                      return false;
+                    }
+
+                    setHasLoadedSharedReports(true);
+                    setSharedReports((current) => [payload.data!, ...current]);
+                    return true;
+                  } catch {
+                    return false;
+                  }
+                }}
+                onCreateLocalReport={(report) => {
+                  setLocalReports((current) => [
+                    report,
+                    ...current.filter((entry) => entry.id !== report.id)
+                  ]);
+                }}
+                onRemoveLocalReport={(reportId) => {
+                  setLocalReports((current) => current.filter((entry) => entry.id !== reportId));
+                }}
+              />
+              <section className="panel-card shell-card">
+                <div className="panel-header">
+                  <h2>{homeT("quickSignalsTitle")}</h2>
+                  <p>{homeT("quickSignalsSubtitle")}</p>
+                </div>
+                <div className="signal-stack">
+                  {pulseReports.map((report) => (
+                    <article className="signal-card" key={report.id}>
+                      <span className={`signal-badge severity-${report.severity.toLowerCase()}`}>
+                        {report.severity}
+                      </span>
+                      <div>
+                        <strong>{report.title}</strong>
+                        <p>
+                          {report.confirmations}x | {report.ageMinutes}m
+                        </p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              <section className="panel-card shell-card">
+                <div className="panel-header">
+                  <h2>{homeT("dashboardActionsTitle")}</h2>
+                  <p>{homeT("dashboardActionsSubtitle")}</p>
+                </div>
+                <div className="button-stack">
+                  <button
+                    className="primary-button full-width-button"
+                    type="button"
+                    onClick={() => setActiveTab("routes")}
+                  >
+                    {homeT("lastRide.repeat")}
+                  </button>
+                  <button
+                    className="ghost-button full-width-button"
+                    type="button"
+                    onClick={() => setActiveTab("social")}
+                  >
+                    {homeT("socialHub.openSocial")}
+                  </button>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section className="dashboard-secondary-grid">
+            <section className="hero-panel shell-card dashboard-story-panel">
+              <div className="hero-toolbar">
+                <span className="prototype-pill">{metaLabels.prototype}</span>
+                <ModeToggle
+                  rideLabel={labels.rideMode}
+                  exploreLabel={labels.exploreMode}
+                  value={mode}
+                  onChange={setMode}
+                />
               </div>
-              <div className="signal-stack">
-                {pulseReports.map((report) => (
-                  <article className="signal-card" key={report.id}>
-                    <span className={`signal-badge severity-${report.severity.toLowerCase()}`}>
-                      {report.severity}
-                    </span>
-                    <div>
-                      <strong>{report.title}</strong>
-                      <p>
-                        {report.confirmations}x | {report.ageMinutes}m
-                      </p>
-                    </div>
+              <div className="hero-copy">
+                <p className="eyebrow">{hero.eyebrow}</p>
+                <h1>{hero.title}</h1>
+                <p className="hero-subtitle">{hero.subtitle}</p>
+              </div>
+              <section className="stat-ribbon">
+                {stats.map((stat) => (
+                  <article className="stat-card" key={stat.label}>
+                    <span>{stat.label}</span>
+                    <strong>{stat.value}</strong>
                   </article>
                 ))}
-              </div>
+              </section>
             </section>
 
-            <section className="panel-card shell-card">
-              <div className="panel-header">
-                <h2>{homeT("dashboardActionsTitle")}</h2>
-                <p>{homeT("dashboardActionsSubtitle")}</p>
-              </div>
-              <div className="button-stack">
-                <button
-                  className="primary-button full-width-button"
-                  type="button"
-                  onClick={() => setActiveTab("routes")}
-                >
-                  {homeT("lastRide.repeat")}
-                </button>
-                <button
-                  className="ghost-button full-width-button"
-                  type="button"
-                  onClick={() => setActiveTab("social")}
-                >
-                  {homeT("socialHub.openSocial")}
-                </button>
-              </div>
-            </section>
-          </div>
-        </section>
+            <div className="hero-stack">
+              <section className="panel-card shell-card hero-summary-card">
+                <div className="panel-header">
+                  <h2>{homeT("weekly.title")}</h2>
+                  <span className="status-chip accent-chip">{homeT("weekly.badge")}</span>
+                </div>
+                <p className="summary-copy">{homeT("weekly.subtitle")}</p>
+                <div className="summary-metrics">
+                  {weeklyStats.map((stat) => (
+                    <article className="summary-stat" key={stat.label}>
+                      <span>{stat.label}</span>
+                      <strong>{stat.value}</strong>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              <section className="panel-card shell-card hero-summary-card">
+                <div className="panel-header">
+                  <h2>{homeT("lastRide.title")}</h2>
+                  <span className="status-chip">{selectedTheme.title}</span>
+                </div>
+                <p className="summary-copy">{homeT("lastRide.subtitle")}</p>
+                <div className="summary-metrics route-summary-metrics">
+                  <article className="summary-stat">
+                    <span>{metaLabels.safety}</span>
+                    <strong>{selectedTheme.safety}</strong>
+                  </article>
+                  <article className="summary-stat">
+                    <span>{metaLabels.distance}</span>
+                    <strong>{selectedTheme.distanceKm} km</strong>
+                  </article>
+                  <article className="summary-stat">
+                    <span>{metaLabels.elevation}</span>
+                    <strong>{selectedTheme.elevationM} m</strong>
+                  </article>
+                </div>
+                <div className="button-row">
+                  <button
+                    className="primary-button"
+                    type="button"
+                    onClick={() => setActiveTab("routes")}
+                  >
+                    {homeT("lastRide.repeat")}
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => setActiveTab("routes")}
+                  >
+                    {homeT("lastRide.openRoutes")}
+                  </button>
+                </div>
+              </section>
+            </div>
+          </section>
+        </>
       ) : null}
 
       {activeTab === "routes" ? (

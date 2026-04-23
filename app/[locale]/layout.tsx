@@ -49,6 +49,9 @@ export default async function LocaleLayout({
                 plannedLabel={cityT("planned")}
               />
               <div className="utility-strip">
+                <Link className="header-link" href={`/${locale}/settings`}>
+                  Settings
+                </Link>
                 <Link className="header-link" href={`/${locale}/privacy`}>
                   {t("privacyLink")}
                 </Link>
