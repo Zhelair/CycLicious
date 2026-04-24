@@ -89,6 +89,24 @@ alter table public.report_confirmations enable row level security;
 alter table public.meetups enable row level security;
 alter table public.places enable row level security;
 
+drop policy if exists "profiles_select_public_handles" on public.profiles;
+drop policy if exists "profiles_insert_own_row" on public.profiles;
+drop policy if exists "profiles_update_own_row" on public.profiles;
+drop policy if exists "consents_select_own_row" on public.consents;
+drop policy if exists "consents_insert_own_row" on public.consents;
+drop policy if exists "consents_update_own_row" on public.consents;
+drop policy if exists "reports_select_public_active" on public.reports;
+drop policy if exists "reports_insert_authenticated" on public.reports;
+drop policy if exists "reports_update_owner" on public.reports;
+drop policy if exists "report_confirmations_select_public" on public.report_confirmations;
+drop policy if exists "report_confirmations_insert_own_row" on public.report_confirmations;
+drop policy if exists "meetups_select_visible" on public.meetups;
+drop policy if exists "meetups_insert_owner" on public.meetups;
+drop policy if exists "meetups_update_owner" on public.meetups;
+drop policy if exists "places_select_public_approved" on public.places;
+drop policy if exists "places_insert_authenticated" on public.places;
+drop policy if exists "places_update_owner" on public.places;
+
 create policy "profiles_select_public_handles"
 on public.profiles
 for select
