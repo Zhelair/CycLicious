@@ -101,6 +101,73 @@ textarea {
   gap: 10px;
 }
 
+.auth-panel {
+  position: relative;
+}
+
+.auth-trigger.is-active {
+  background: rgba(18, 116, 255, 0.12);
+  color: var(--accent-blue);
+}
+
+.auth-card {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 28;
+  width: min(360px, calc(100vw - 32px));
+  padding: 18px;
+}
+
+.auth-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.auth-field span {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.auth-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 34, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text-main);
+}
+
+.auth-session-card {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(15, 23, 34, 0.08);
+}
+
+.auth-session-card span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.auth-session-card strong {
+  font-size: 0.96rem;
+}
+
+.auth-actions {
+  margin-top: 14px;
+}
+
+.auth-note {
+  margin-top: 12px;
+}
+
 .header-link,
 .locale-switcher {
   display: inline-flex;
@@ -253,6 +320,58 @@ textarea {
   flex-direction: column;
   justify-content: space-between;
   min-height: 360px;
+}
+
+.dashboard-story-panel {
+  min-height: 0;
+  padding: 22px 24px;
+}
+
+.dashboard-story-panel .hero-toolbar {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.dashboard-story-panel .hero-copy {
+  display: grid;
+  gap: 0;
+  margin-top: 16px;
+  max-width: 52ch;
+  min-width: 0;
+}
+
+.dashboard-story-panel .hero-copy h1 {
+  max-width: none;
+  font-size: clamp(2.3rem, 4.6vw, 3.9rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.dashboard-story-panel .hero-subtitle {
+  margin-top: 12px;
+  max-width: 60ch;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.dashboard-story-panel .stat-ribbon {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.dashboard-story-panel .stat-card {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.dashboard-story-panel .stat-card span {
+  font-size: 0.76rem;
+}
+
+.dashboard-story-panel .stat-card strong {
+  font-size: 1.55rem;
 }
 
 .page-shell.mode-ride .hero-panel {
@@ -784,6 +903,22 @@ textarea {
   font-size: 0.76rem;
 }
 
+.map-picker-hint {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  z-index: 4;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(12, 18, 27, 0.84);
+  color: var(--text-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-soft);
+}
+
 .live-map-status.status-live strong {
   color: #1659b9;
 }
@@ -1121,6 +1256,10 @@ textarea {
   margin-top: 18px;
 }
 
+.inline-control-row {
+  margin-top: 14px;
+}
+
 .legal-link-button {
   display: inline-flex;
   align-items: center;
@@ -1430,6 +1569,17 @@ textarea {
   box-shadow: 0 0 0 8px rgba(227, 164, 58, 0.18);
 }
 
+.picker-pin {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 4px solid #ffffff;
+  background: var(--accent-poppy);
+  box-shadow:
+    0 0 0 8px rgba(213, 102, 67, 0.2),
+    0 14px 26px rgba(15, 23, 34, 0.18);
+}
+
 .maplibregl-control-container .maplibregl-ctrl-top-right {
   top: 18px;
   right: 18px;
@@ -1617,6 +1767,11 @@ textarea {
     justify-content: space-between;
   }
 
+  .auth-card {
+    left: 0;
+    right: auto;
+  }
+
   .city-switcher {
     flex-direction: column;
     align-items: stretch;
@@ -1683,6 +1838,13 @@ textarea {
     padding: 18px;
   }
 
+  .auth-card {
+    position: static;
+    width: 100%;
+    margin-top: 10px;
+    padding: 16px;
+  }
+
   .hero-copy {
     margin-top: 14px;
   }
@@ -1702,6 +1864,10 @@ textarea {
   .hero-copy h1 {
     max-width: none;
     font-size: clamp(2.35rem, 14vw, 3.6rem);
+  }
+
+  .dashboard-story-panel .hero-copy h1 {
+    font-size: clamp(2rem, 12vw, 3rem);
   }
 
   .stat-ribbon {

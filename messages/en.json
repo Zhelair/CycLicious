@@ -12,6 +12,25 @@
     "plovdiv": "Plovdiv",
     "varna": "Varna"
   },
+  "auth": {
+    "title": "Account and sync",
+    "subtitle": "Sign in with a magic link so reports and meetups can sync across devices.",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signingOut": "Signing out...",
+    "account": "Account",
+    "magicLink": "Magic link",
+    "live": "Synced",
+    "signedInAs": "Signed in as",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Send magic link",
+    "sendingLink": "Sending...",
+    "checkInbox": "Check your inbox for the sign-in link.",
+    "signedIn": "Signed in. Shared sync is ready.",
+    "signedOut": "Signed out. Drafts still stay on this device.",
+    "unavailable": "Supabase auth is not configured yet. Add the public URL and anon key to enable sign-in."
+  },
   "home": {
     "eyebrow": "Sofia's living map for cyclists",
     "title": "Ride calmer. Explore smarter.",
@@ -42,7 +61,20 @@
     "reportLocation": {
       "precise": "Report will use your current location when permission is available.",
       "fallback": "GPS was approximate or unavailable, so the report used the Sofia fallback pin.",
-      "blocked": "Location permission was blocked, so the report used the Sofia fallback pin."
+      "blocked": "Location permission was blocked, so the report used the Sofia fallback pin.",
+      "manual": "Report will use the exact map pin you selected."
+    },
+    "reportMapPick": {
+      "start": "Pick on map",
+      "change": "Change map pin",
+      "clear": "Clear pin",
+      "active": "Pin mode is active. Click the map for exact placement.",
+      "picked": "Map pin selected"
+    },
+    "reportSync": {
+      "sharedSaved": "Saved on device and published to the shared map.",
+      "authRequired": "Saved on device. Sign in later to publish this report to the shared map.",
+      "unavailable": "Saved on device. Shared sync is not configured or currently unavailable."
     },
     "tabs": {
       "dashboard": "Dashboard",

@@ -18,6 +18,11 @@ type LiveMapProps = {
   onGpsStateChange?: (
     value: "idle" | "locating" | "active" | "blocked" | "unsupported"
   ) => void;
+  picker: {
+    isActive: boolean;
+    selectedCoordinates: [number, number] | null;
+    onPickCoordinates: (coordinates: [number, number]) => void;
+  };
   theme: {
     accent: string;
     previewPath: [number, number][];
@@ -70,6 +75,7 @@ export function LiveMap({
   mode,
   meetup,
   onGpsStateChange,
+  picker,
   theme,
   reports
 }: LiveMapProps) {
@@ -78,6 +84,7 @@ export function LiveMap({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker[]>([]);
   const riderMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const pickerMarkerRef = useRef<maplibregl.Marker | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
     "loading"
   );
@@ -155,6 +162,8 @@ export function LiveMap({
       markerRef.current = [];
       riderMarkerRef.current?.remove();
       riderMarkerRef.current = null;
+      pickerMarkerRef.current?.remove();
+      pickerMarkerRef.current = null;
       map.remove();
       mapRef.current = null;
     };
@@ -528,6 +537,70 @@ export function LiveMap({
   }, [mode]);
 
   useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const pickerHandler = (event: maplibregl.MapMouseEvent) => {
+      if (!picker.isActive) {
+        return;
+      }
+
+      picker.onPickCoordinates([event.lngLat.lng, event.lngLat.lat]);
+    };
+
+    map.on("click", pickerHandler);
+
+    return () => {
+      map.off("click", pickerHandler);
+    };
+  }, [picker]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    if (!picker.selectedCoordinates) {
+      pickerMarkerRef.current?.remove();
+      pickerMarkerRef.current = null;
+      map.getCanvas().style.cursor = "";
+      return;
+    }
+
+    const markerElement = document.createElement("div");
+    markerElement.className = "picker-pin";
+    pickerMarkerRef.current?.remove();
+    pickerMarkerRef.current = new maplibregl.Marker({element: markerElement})
+      .setLngLat(picker.selectedCoordinates)
+      .addTo(map);
+
+    map.getCanvas().style.cursor = picker.isActive ? "crosshair" : "";
+
+    return () => {
+      map.getCanvas().style.cursor = "";
+    };
+  }, [picker.isActive, picker.selectedCoordinates]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    map.getCanvas().style.cursor = picker.isActive ? "crosshair" : "";
+
+    return () => {
+      map.getCanvas().style.cursor = "";
+    };
+  }, [picker.isActive]);
+
+  useEffect(() => {
     if (locateRequestCount === 0) {
       return;
     }
@@ -603,6 +676,7 @@ export function LiveMap({
         <strong>{statusLabel}</strong>
         <span>{statusDetail}</span>
       </div>
+      {picker.isActive ? <div className="map-picker-hint">Click the map to place the pin.</div> : null}
       <div
         className={`live-map ${status === "ready" ? "is-ready" : ""}`}
         ref={containerRef}

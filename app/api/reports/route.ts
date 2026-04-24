@@ -1,8 +1,8 @@
 import {NextResponse} from "next/server";
 
 import {getReportPreset} from "../../../lib/data/report-presets";
-import {getSupabaseAdminClient} from "../../../lib/supabase/admin";
 import {SharedReportRecord, isReportTypeKey} from "../../../lib/supabase/reports";
+import {getSupabaseServerClient} from "../../../lib/supabase/server";
 
 type CreateReportPayload = {
   reportTypeKey?: string;
@@ -20,11 +20,11 @@ function isCoordinates(value: unknown): value is [number, number] {
 }
 
 export async function GET() {
-  const supabase = getSupabaseAdminClient();
+  const supabase = getSupabaseServerClient();
 
   if (!supabase) {
     return NextResponse.json(
-      {error: "Supabase is not configured for server access."},
+      {error: "Supabase is not configured for public reads yet."},
       {status: 503}
     );
   }
@@ -46,12 +46,23 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const supabase = getSupabaseAdminClient();
+  const authHeader = request.headers.get("authorization");
+  const accessToken = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length).trim()
+    : "";
+  const supabase = getSupabaseServerClient(accessToken);
 
   if (!supabase) {
     return NextResponse.json(
-      {error: "Supabase is not configured for server access."},
+      {error: "Supabase is not configured for shared report sync yet."},
       {status: 503}
+    );
+  }
+
+  if (!accessToken) {
+    return NextResponse.json(
+      {error: "Sign in is required before publishing shared reports.", code: "auth_required"},
+      {status: 401}
     );
   }
 
@@ -77,9 +88,22 @@ export async function POST(request: Request) {
     return NextResponse.json({error: "Report note is too long."}, {status: 400});
   }
 
+  const {
+    data: {user},
+    error: userError
+  } = await supabase.auth.getUser(accessToken);
+
+  if (userError || !user) {
+    return NextResponse.json(
+      {error: "Your session could not be verified.", code: "auth_required"},
+      {status: 401}
+    );
+  }
+
   const {data, error} = await supabase
     .from("reports")
     .insert({
+      user_id: user.id,
       city_slug: "sofia",
       report_type: preset.id,
       category_key: preset.categoryKey,

@@ -196,6 +196,21 @@ This is the practical source shortlist for Phase 4. The goal is to decide what w
   - The site states that its software, design, and on-page information are copyright protected except where the material is public information.
   - Treat these pages as human research sources, not as direct machine-ingest sources.
 
+### 11. Sofenhagen cycling map
+
+- Leads:
+  - `https://www.sofenhagen.com/`
+- Could provide:
+  - local safety heuristics
+  - route inspiration
+  - QA reference for bike-friendly corridors
+  - community-relevant place ideas
+- License clarity: `low`
+- Recommendation: `reference only`
+- Practical note:
+  - The site is clearly useful as local cycling knowledge, but we should not auto-ingest it without explicit permission or a clear reuse license.
+  - Use it as a product and QA reference, or pursue a direct partnership/permission path later.
+
 ## Recommended MVP ingest order
 
 1. `OpenStreetMap` for the base road graph and bike-relevant POIs.
