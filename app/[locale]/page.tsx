@@ -1,6 +1,7 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 
 import {AppShell} from "../../components/app-shell";
+import {placeCategoryKeys} from "../../lib/data/places";
 import {featuredMeetup} from "../../lib/data/meetups";
 import {reportPresets} from "../../lib/data/report-presets";
 import {communityReports} from "../../lib/data/reports";
@@ -66,6 +67,39 @@ export default async function LocaleHomePage({
         locationFallback: t("reportLocation.fallback"),
         locationBlocked: t("reportLocation.blocked"),
         locationManual: t("reportLocation.manual")
+<<<<<<< Updated upstream
+=======
+      }}
+      placeForm={{
+        title: t("placeTitle"),
+        subtitle: t("placeSubtitle"),
+        nameLabel: t("placeNameLabel"),
+        namePlaceholder: t("placeNamePlaceholder"),
+        noteLabel: t("placeNoteLabel"),
+        notePlaceholder: t("placeNotePlaceholder"),
+        categoryLabel: t("placeCategoryLabel"),
+        submitLabel: t("placeSubmit"),
+        savingLabel: t("placeSaving"),
+        savedLabel: t("placeSaved"),
+        safetyNote: t("placeSafetyNote"),
+        categories: placeCategoryKeys.map((id) => ({
+            id,
+            label: miscT(id)
+          })),
+        pickerLabels: {
+          start: t("placeMapPick.start"),
+          change: t("placeMapPick.change"),
+          clear: t("placeMapPick.clear"),
+          active: t("placeMapPick.active"),
+          picked: t("placeMapPick.picked"),
+          required: t("placeMapPick.required")
+        },
+        resultLabels: {
+          submitted: t("placeResult.submitted"),
+          authRequired: t("placeResult.authRequired"),
+          unavailable: t("placeResult.unavailable")
+        }
+>>>>>>> Stashed changes
       }}
       reportForm={{
         title: t("reportTitle"),

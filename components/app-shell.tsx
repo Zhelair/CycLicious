@@ -5,6 +5,10 @@ import {useTranslations} from "next-intl";
 
 import {appDb, type LocalReportRecord} from "../lib/db/app-db";
 import {ModeToggle} from "./mode-toggle";
+<<<<<<< Updated upstream
+=======
+import {PlaceComposer, type PlaceSaveResult} from "./place-composer";
+>>>>>>> Stashed changes
 import {ReportComposer, type SharedReportSaveResult} from "./report-composer";
 import {MapStage} from "./map-stage";
 import {MeetupCard} from "./meetup-card";
@@ -13,7 +17,12 @@ import {TransitRulesCard} from "./transit-rules-card";
 import {LegalConsentGate} from "./legal-consent-gate";
 import type {ReportCategoryKey, ReportTypeKey} from "../lib/data/report-presets";
 import type {ReportSeverity} from "../lib/data/reports";
+import {seededPlaces, type PlaceCategoryKey} from "../lib/data/places";
 import {normalizeSharedReport, type SharedReportRecord} from "../lib/supabase/reports";
+<<<<<<< Updated upstream
+=======
+import {normalizeSharedPlace as normalizeSharedPlaceRecord, type SharedPlaceRecord as SharedPlaceRecordType} from "../lib/supabase/places";
+>>>>>>> Stashed changes
 import {getSupabaseBrowserClient} from "../lib/supabase/browser";
 
 type AppTab = "dashboard" | "routes" | "social";
@@ -62,6 +71,39 @@ type AppShellProps = {
     locationFallback: string;
     locationBlocked: string;
     locationManual: string;
+<<<<<<< Updated upstream
+=======
+  };
+  placeForm: {
+    title: string;
+    subtitle: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    noteLabel: string;
+    notePlaceholder: string;
+    categoryLabel: string;
+    submitLabel: string;
+    savingLabel: string;
+    savedLabel: string;
+    safetyNote: string;
+    categories: {
+      id: PlaceCategoryKey;
+      label: string;
+    }[];
+    pickerLabels: {
+      start: string;
+      change: string;
+      clear: string;
+      active: string;
+      picked: string;
+      required: string;
+    };
+    resultLabels: {
+      submitted: string;
+      authRequired: string;
+      unavailable: string;
+    };
+>>>>>>> Stashed changes
   };
   reportForm: {
     title: string;
@@ -141,6 +183,7 @@ export function AppShell({
   stats,
   metaLabels,
   labels,
+  placeForm,
   reportForm,
   meetup,
   transit,
@@ -156,12 +199,21 @@ export function AppShell({
   const [selectedThemeId, setSelectedThemeId] = useState(themeCards[0]?.id ?? "");
   const [localReports, setLocalReports] = useState<LocalReportRecord[]>([]);
   const [sharedReports, setSharedReports] = useState<SharedReportRecord[]>([]);
+  const [sharedPlaces, setSharedPlaces] = useState<SharedPlaceRecordType[]>([]);
   const [hasLoadedSharedReports, setHasLoadedSharedReports] = useState(false);
+  const [hasLoadedSharedPlaces, setHasLoadedSharedPlaces] = useState(false);
   const [mapWindowMode, setMapWindowMode] = useState<"split" | "focus">("split");
   const [reportPickerCoordinates, setReportPickerCoordinates] = useState<[number, number] | null>(
     null
   );
   const [isPickingReportCoordinates, setIsPickingReportCoordinates] = useState(false);
+<<<<<<< Updated upstream
+=======
+  const [placePickerCoordinates, setPlacePickerCoordinates] = useState<[number, number] | null>(
+    null
+  );
+  const [isPickingPlaceCoordinates, setIsPickingPlaceCoordinates] = useState(false);
+>>>>>>> Stashed changes
   const [preferencesReady, setPreferencesReady] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
 
@@ -254,12 +306,6 @@ export function AppShell({
   }, [activeTab, preferencesReady]);
 
   useEffect(() => {
-    if (activeTab === "social" && mapWindowMode === "focus") {
-      setMapWindowMode("split");
-    }
-  }, [activeTab, mapWindowMode]);
-
-  useEffect(() => {
     if (typeof document === "undefined") {
       return;
     }
@@ -287,6 +333,37 @@ export function AppShell({
     };
 
     void loadLocalReports();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadSharedPlaces = async () => {
+      try {
+        const response = await fetch("/api/places", {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as {data?: SharedPlaceRecordType[]};
+
+        if (!isCancelled && Array.isArray(payload.data)) {
+          setSharedPlaces(payload.data);
+          setHasLoadedSharedPlaces(true);
+        }
+      } catch {
+        // Keep seeded places when the backend is not configured yet.
+      }
+    };
+
+    void loadSharedPlaces();
 
     return () => {
       isCancelled = true;
@@ -364,13 +441,48 @@ export function AppShell({
     })),
     ...seededOrSharedReports
   ];
+  const mergedPlaces = hasLoadedSharedPlaces
+    ? sharedPlaces.map(normalizeSharedPlaceRecord)
+    : seededPlaces;
   const pulseReports = mergedReports.slice(0, 4);
+  const pulsePlaces = mergedPlaces.slice(0, 4);
   const weeklyStats = [
     {label: homeT("weekly.streak"), value: "3x"},
     {label: homeT("weekly.rides"), value: "4"},
     {label: homeT("weekly.calmKm"), value: "42 km"}
   ];
   const mapIsFocused = mapWindowMode === "focus";
+<<<<<<< Updated upstream
+=======
+  const activePicker =
+    activeTab === "social"
+      ? {
+          isActive: isPickingPlaceCoordinates,
+          labels: {
+            idle: placeForm.pickerLabels.start,
+            active: placeForm.pickerLabels.active,
+            picked: placeForm.pickerLabels.picked
+          },
+          selectedCoordinates: placePickerCoordinates,
+          onPickCoordinates: (coordinates: [number, number]) => {
+            setPlacePickerCoordinates(coordinates);
+            setIsPickingPlaceCoordinates(false);
+          }
+        }
+      : {
+          isActive: isPickingReportCoordinates,
+          labels: {
+            idle: reportForm.mapPickLabels.start,
+            active: reportForm.mapPickLabels.active,
+            picked: reportForm.mapPickLabels.picked
+          },
+          selectedCoordinates: reportPickerCoordinates,
+          onPickCoordinates: (coordinates: [number, number]) => {
+            setReportPickerCoordinates(coordinates);
+            setIsPickingReportCoordinates(false);
+          }
+        };
+>>>>>>> Stashed changes
   const createSharedReport = async ({
     reportTypeKey,
     note,
@@ -434,6 +546,67 @@ export function AppShell({
       return "unavailable";
     }
   };
+<<<<<<< Updated upstream
+=======
+  const createPlace = async ({
+    title,
+    categoryKey,
+    description,
+    coordinates
+  }: {
+    title: string;
+    categoryKey: PlaceCategoryKey;
+    description: string;
+    coordinates: [number, number];
+  }): Promise<PlaceSaveResult> => {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      return "unavailable";
+    }
+
+    const {
+      data: {session}
+    } = await supabase.auth.getSession();
+    const accessToken = session?.access_token;
+
+    if (!accessToken) {
+      return "auth-required";
+    }
+
+    try {
+      const response = await fetch("/api/places", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          title,
+          categoryKey,
+          description,
+          coordinates
+        })
+      });
+
+      if (response.status === 401) {
+        return "auth-required";
+      }
+
+      if (response.status === 503) {
+        return "unavailable";
+      }
+
+      if (!response.ok) {
+        return "unavailable";
+      }
+
+      return "submitted";
+    } catch {
+      return "unavailable";
+    }
+  };
+>>>>>>> Stashed changes
 
   if (!selectedTheme) {
     return null;
@@ -481,6 +654,7 @@ export function AppShell({
               metaLabels={metaLabels}
               meetup={meetup}
               mode={mode}
+<<<<<<< Updated upstream
               picker={{
                 isActive: isPickingReportCoordinates,
                 labels: {
@@ -494,6 +668,10 @@ export function AppShell({
                   setIsPickingReportCoordinates(false);
                 }
               }}
+=======
+              picker={activePicker}
+              places={mergedPlaces}
+>>>>>>> Stashed changes
               onOpenRoutes={() => setActiveTab("routes")}
               onOpenSocial={() => setActiveTab("social")}
               onToggleExpanded={() =>
@@ -675,6 +853,7 @@ export function AppShell({
             metaLabels={metaLabels}
             meetup={meetup}
             mode={mode}
+<<<<<<< Updated upstream
             picker={{
               isActive: isPickingReportCoordinates,
               labels: {
@@ -688,6 +867,10 @@ export function AppShell({
                 setIsPickingReportCoordinates(false);
               }
             }}
+=======
+            picker={activePicker}
+            places={mergedPlaces}
+>>>>>>> Stashed changes
             onOpenRoutes={() => setActiveTab("routes")}
             onOpenSocial={() => setActiveTab("social")}
             onToggleExpanded={() =>
@@ -746,8 +929,26 @@ export function AppShell({
       ) : null}
 
       {activeTab === "social" ? (
-        <section className="social-grid">
-          <div className="panel-grid">
+        <section className={`dashboard-grid tab-panel-grid ${mapIsFocused ? "map-focused" : ""}`}>
+          <MapStage
+            expanded={mapIsFocused}
+            featuredReports={pulseReports}
+            labels={labels}
+            metaLabels={metaLabels}
+            meetup={meetup}
+            mode={mode}
+            picker={activePicker}
+            places={mergedPlaces}
+            onOpenRoutes={() => setActiveTab("routes")}
+            onOpenSocial={() => setActiveTab("social")}
+            onToggleExpanded={() =>
+              setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
+            }
+            reports={mergedReports}
+            theme={selectedTheme}
+          />
+
+          <div className="dashboard-sidebar">
             <section className="panel-card shell-card">
               <div className="panel-header">
                 <h2>{homeT("socialHub.title")}</h2>
@@ -768,6 +969,40 @@ export function AppShell({
                 </article>
               </div>
             </section>
+
+            <PlaceComposer
+              {...placeForm}
+              isPickingCoordinates={isPickingPlaceCoordinates}
+              onClearCoordinatePick={() => {
+                setPlacePickerCoordinates(null);
+                setIsPickingPlaceCoordinates(false);
+              }}
+              onCreatePlace={createPlace}
+              onStartCoordinatePick={() => {
+                setMapWindowMode("focus");
+                setIsPickingPlaceCoordinates(true);
+              }}
+              selectedCoordinates={placePickerCoordinates}
+            />
+
+            <section className="panel-card shell-card">
+              <div className="panel-header">
+                <h2>{homeT("socialHub.placesTitle")}</h2>
+                <p>{homeT("socialHub.placesSubtitle")}</p>
+              </div>
+              <div className="signal-stack">
+                {pulsePlaces.map((place) => (
+                  <article className="signal-card" key={place.id}>
+                    <span className={`place-badge source-${place.sourceKind}`}>{miscT(place.categoryKey)}</span>
+                    <div>
+                      <strong>{place.title}</strong>
+                      <p>{place.description}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
             <MeetupCard
               actionFeedbackLabels={{
                 joined: labels.meetupJoined,
@@ -779,30 +1014,6 @@ export function AppShell({
               {...meetup}
             />
             <TransitRulesCard {...transit} />
-          </div>
-
-          <div className="panel-grid">
-            <section className="panel-card shell-card">
-              <div className="panel-header">
-                <h2>{homeT("quickSignalsTitle")}</h2>
-                <p>{homeT("quickSignalsSubtitle")}</p>
-              </div>
-              <div className="signal-stack">
-                {pulseReports.map((report) => (
-                  <article className="signal-card" key={report.id}>
-                    <span className={`signal-badge severity-${report.severity.toLowerCase()}`}>
-                      {report.severity}
-                    </span>
-                    <div>
-                      <strong>{report.title}</strong>
-                      <p>
-                        {report.confirmations}x | {report.ageMinutes}m
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
           </div>
         </section>
       ) : null}

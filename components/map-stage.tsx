@@ -38,6 +38,17 @@ type MapStageProps = {
     title: string;
     coordinates: [number, number];
   };
+<<<<<<< Updated upstream
+=======
+  places: {
+    id: string;
+    title: string;
+    categoryKey: string;
+    description: string;
+    sourceKind: string;
+    coordinates: [number, number];
+  }[];
+>>>>>>> Stashed changes
   picker: {
     isActive: boolean;
     labels: {
@@ -77,6 +88,10 @@ export function MapStage({
   mode,
   metaLabels,
   meetup,
+<<<<<<< Updated upstream
+=======
+  places,
+>>>>>>> Stashed changes
   picker,
   onOpenRoutes,
   onOpenSocial,
@@ -109,6 +124,10 @@ export function MapStage({
         meetup={meetup}
         mode={mode}
         onGpsStateChange={setGpsState}
+<<<<<<< Updated upstream
+=======
+        places={places}
+>>>>>>> Stashed changes
         picker={picker}
         reports={reports}
         theme={theme}

@@ -61,11 +61,33 @@ create table if not exists public.meetups (
   constraint meetups_visibility_check check (visibility in ('public', 'unlisted', 'private'))
 );
 
+create table if not exists public.places (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  city_slug text not null default 'sofia',
+  title text not null,
+  category_key text not null,
+  description text not null default '',
+  source_kind text not null default 'community',
+  visibility text not null default 'public',
+  status text not null default 'pending',
+  latitude double precision not null,
+  longitude double precision not null,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  constraint places_source_kind_check check (source_kind in ('official', 'admin', 'community')),
+  constraint places_visibility_check check (visibility in ('public', 'unlisted', 'private')),
+  constraint places_status_check check (status in ('pending', 'approved', 'rejected', 'hidden')),
+  constraint places_title_length_check check (char_length(title) between 3 and 80),
+  constraint places_description_length_check check (char_length(description) <= 280)
+);
+
 alter table public.profiles enable row level security;
 alter table public.consents enable row level security;
 alter table public.reports enable row level security;
 alter table public.report_confirmations enable row level security;
 alter table public.meetups enable row level security;
+alter table public.places enable row level security;
 
 create policy "profiles_select_public_handles"
 on public.profiles
@@ -150,3 +172,25 @@ for update
 to authenticated
 using (auth.uid() = owner_id)
 with check (auth.uid() = owner_id);
+
+create policy "places_select_public_approved"
+on public.places
+for select
+using (status = 'approved' and visibility in ('public', 'unlisted'));
+
+create policy "places_insert_authenticated"
+on public.places
+for insert
+to authenticated
+with check (
+  auth.uid() = user_id
+  and source_kind = 'community'
+  and status = 'pending'
+);
+
+create policy "places_update_owner"
+on public.places
+for update
+to authenticated
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);

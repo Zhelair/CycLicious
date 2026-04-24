@@ -1171,6 +1171,33 @@ textarea {
   color: #2a6953;
 }
 
+.place-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.place-badge.source-official {
+  background: rgba(18, 116, 255, 0.14);
+  color: #1659b9;
+}
+
+.place-badge.source-admin {
+  background: rgba(59, 125, 103, 0.16);
+  color: #2a6953;
+}
+
+.place-badge.source-community {
+  background: rgba(227, 164, 58, 0.2);
+  color: #8e5f0d;
+}
+
 .theme-rail,
 .panel-card {
   padding: 22px;
@@ -1367,6 +1394,33 @@ textarea {
   flex-wrap: wrap;
   gap: 8px;
   margin: 16px 0 14px;
+}
+
+.field-stack + .field-stack {
+  margin-top: 14px;
+}
+
+.field-label,
+.composer-field span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.composer-field {
+  display: grid;
+  gap: 8px;
+}
+
+.composer-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 34, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--text-main);
 }
 
 .chip-row button,
@@ -1580,6 +1634,44 @@ textarea {
     0 14px 26px rgba(15, 23, 34, 0.18);
 }
 
+<<<<<<< Updated upstream
+=======
+.place-pin {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 3px solid #ffffff;
+  box-shadow: 0 10px 20px rgba(15, 23, 34, 0.18);
+}
+
+.place-pin span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.place-pin-bikeParking {
+  background: #1274ff;
+}
+
+.place-pin-repairStop {
+  background: #3b7d67;
+}
+
+.place-pin-coffeeStop {
+  background: #8b5e3c;
+}
+
+.place-pin-waterPoint {
+  background: #3eb7da;
+}
+
+.place-pin-quietConnector {
+  background: #748b2e;
+}
+
+>>>>>>> Stashed changes
 .maplibregl-control-container .maplibregl-ctrl-top-right {
   top: 18px;
   right: 18px;
