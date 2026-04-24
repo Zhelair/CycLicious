@@ -162,6 +162,35 @@
     "meetups": {
       "southParkRide": "После работы через Южный парк",
       "meetupNote": "Точная точка встречи видна после одобрения. Instagram или Telegram лучше раскрывать только по взаимному согласию."
+    },
+    "meetupTitle": "Create meetup",
+    "meetupSubtitle": "Drop an exact pin, set the time and publish a ride plan that can be reviewed later.",
+    "meetupNameLabel": "Meetup title",
+    "meetupNamePlaceholder": "Example: easy evening lap from South Park",
+    "meetupWhenLabel": "When",
+    "meetupAreaLabel": "Area note",
+    "meetupAreaPlaceholder": "Example: fountain by the main entrance",
+    "meetupPaceLabel": "Pace",
+    "meetupPacePlaceholder": "Example: steady social pace",
+    "meetupNoteLabel": "Short note",
+    "meetupNotePlaceholder": "Add what riders should expect, bring or know before joining...",
+    "meetupVisibilityLabel": "Visibility",
+    "meetupSubmit": "Publish meetup",
+    "meetupSaving": "Publishing...",
+    "meetupSaved": "Published",
+    "meetupComposerSafetyNote": "Meetups should use public locations and clear timing so riders can decide safely.",
+    "meetupMapPick": {
+      "start": "Pick meetup on map",
+      "change": "Change meetup pin",
+      "clear": "Clear meetup pin",
+      "active": "Meetup pin mode is active. Click the map for exact placement.",
+      "picked": "Meetup pin selected",
+      "required": "Choose an exact point on the map before publishing the meetup."
+    },
+    "meetupResult": {
+      "submitted": "Meetup published to the shared map.",
+      "authRequired": "Sign in before publishing a meetup to the shared map.",
+      "unavailable": "Meetup publishing is unavailable right now."
     }
   },
   "reportTypes": {
@@ -246,8 +275,10 @@
     "coolerRide": "Прохладнее",
     "unlistedLink": "Ссылка по приглашению",
     "todayAt1930": "Сегодня, 19:30",
-    "steadySocial": "Спокойный социальный темп"
-    ,
-    "beta": "Бета"
+    "steadySocial": "Спокойный социальный темп",
+    "beta": "Бета",
+    "public": "Public",
+    "unlisted": "Unlisted",
+    "private": "Private"
   }
 }
