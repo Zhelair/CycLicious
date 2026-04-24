@@ -12,6 +12,25 @@
     "plovdiv": "Plovdiv",
     "varna": "Varna"
   },
+  "auth": {
+    "title": "Account and sync",
+    "subtitle": "Sign in with a magic link so reports and meetups can sync across devices.",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signingOut": "Signing out...",
+    "account": "Account",
+    "magicLink": "Magic link",
+    "live": "Synced",
+    "signedInAs": "Signed in as",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Send magic link",
+    "sendingLink": "Sending...",
+    "checkInbox": "Check your inbox for the sign-in link.",
+    "signedIn": "Signed in. Shared sync is ready.",
+    "signedOut": "Signed out. Drafts still stay on this device.",
+    "unavailable": "Supabase auth is not configured yet. Add the public URL and anon key to enable sign-in."
+  },
   "home": {
     "eyebrow": "Sofia's living map for cyclists",
     "title": "Ride calmer. Explore smarter.",
@@ -23,6 +42,17 @@
     "meetupOverlay": "Meetup pin",
     "reportTitle": "Quick report",
     "reportSubtitle": "Structured reports keep the map useful, fast and easier to moderate.",
+    "placeTitle": "Add a place",
+    "placeSubtitle": "Suggest a useful cycling spot with an exact pin so it can be reviewed for the shared map.",
+    "placeNameLabel": "Place name",
+    "placeNamePlaceholder": "Example: fountain by the park gate",
+    "placeNoteLabel": "Short note",
+    "placeNotePlaceholder": "Add what riders should know about this place...",
+    "placeCategoryLabel": "Place type",
+    "placeSubmit": "Send for review",
+    "placeSaving": "Sending...",
+    "placeSaved": "Sent",
+    "placeSafetyNote": "Community places should be specific, useful and safe to publish after moderation.",
     "notePlaceholder": "Example: parked car blocks the lane, pass only on the sidewalk...",
     "submitReport": "Save locally",
     "savingReport": "Saving...",
@@ -42,7 +72,33 @@
     "reportLocation": {
       "precise": "Report will use your current location when permission is available.",
       "fallback": "GPS was approximate or unavailable, so the report used the Sofia fallback pin.",
-      "blocked": "Location permission was blocked, so the report used the Sofia fallback pin."
+      "blocked": "Location permission was blocked, so the report used the Sofia fallback pin.",
+      "manual": "Report will use the exact map pin you selected."
+    },
+    "reportMapPick": {
+      "start": "Pick on map",
+      "change": "Change map pin",
+      "clear": "Clear pin",
+      "active": "Pin mode is active. Click the map for exact placement.",
+      "picked": "Map pin selected"
+    },
+    "placeMapPick": {
+      "start": "Pick place on map",
+      "change": "Change place pin",
+      "clear": "Clear place pin",
+      "active": "Place pin mode is active. Click the map for exact placement.",
+      "picked": "Place pin selected",
+      "required": "Choose an exact point on the map before submitting the place."
+    },
+    "placeResult": {
+      "submitted": "Place submitted for review. It will appear after moderation.",
+      "authRequired": "Sign in before sending a community place to the shared map.",
+      "unavailable": "Place submission is unavailable right now."
+    },
+    "reportSync": {
+      "sharedSaved": "Saved on device and published to the shared map.",
+      "authRequired": "Saved on device. Sign in later to publish this report to the shared map.",
+      "unavailable": "Saved on device. Shared sync is not configured or currently unavailable."
     },
     "tabs": {
       "dashboard": "Dashboard",
@@ -79,6 +135,8 @@
       "reports": "Reports",
       "meetups": "Meetups",
       "transit": "Transit",
+      "placesTitle": "Map places",
+      "placesSubtitle": "Approved permanent and official places that help the city map stay useful.",
       "openSocial": "Open social"
     },
     "transit": {
@@ -176,6 +234,11 @@
     "afterRide": "Finish with drinks, snacks and bike parking nearby",
     "lateNightRecovery": "Late-night loop with a shkembe chorba ending",
     "summerEscape": "Cooler, greener profile for hot days",
+    "bikeParking": "Bike parking",
+    "repairStop": "Repair stop",
+    "coffeeStop": "Coffee stop",
+    "waterPoint": "Water point",
+    "quietConnector": "Quiet connector",
     "lowStress": "Low stress",
     "balanced": "Balanced",
     "chill": "Chill",

@@ -6,6 +6,8 @@ import {appDb, type LocalReportRecord} from "../lib/db/app-db";
 import type {ReportCategoryKey, ReportTypeKey} from "../lib/data/report-presets";
 import type {ReportSeverity} from "../lib/data/reports";
 
+export type SharedReportSaveResult = "shared" | "auth-required" | "unavailable";
+
 type ReportComposerProps = {
   title: string;
   subtitle: string;
@@ -18,6 +20,18 @@ type ReportComposerProps = {
     precise: string;
     fallback: string;
     blocked: string;
+    manual: string;
+  };
+  mapPickLabels: {
+    start: string;
+    change: string;
+    clear: string;
+    active: string;
+  };
+  syncLabels: {
+    sharedSaved: string;
+    authRequired: string;
+    unavailable: string;
   };
   chipOptions: {
     id: ReportTypeKey;
@@ -29,7 +43,11 @@ type ReportComposerProps = {
     reportTypeKey: ReportTypeKey;
     note: string;
     coordinates: [number, number];
-  }) => Promise<boolean>;
+  }) => Promise<SharedReportSaveResult>;
+  selectedCoordinates: [number, number] | null;
+  isPickingCoordinates: boolean;
+  onStartCoordinatePick: () => void;
+  onClearCoordinatePick: () => void;
   onCreateLocalReport: (report: LocalReportRecord) => void;
   onRemoveLocalReport?: (id: string) => void;
 };
@@ -43,10 +61,15 @@ export function ReportComposer({
   savedLabel,
   safetyNote,
   locationLabels,
+  mapPickLabels,
+  syncLabels,
   chipOptions,
   onCreateSharedReport,
-  onCreateLocalReport
-  ,
+  selectedCoordinates,
+  isPickingCoordinates,
+  onStartCoordinatePick,
+  onClearCoordinatePick,
+  onCreateLocalReport,
   onRemoveLocalReport
 }: ReportComposerProps) {
   const [activeChipId, setActiveChipId] = useState<ReportTypeKey>(
@@ -58,6 +81,7 @@ export function ReportComposer({
     "idle"
   );
   const [locationMessage, setLocationMessage] = useState(locationLabels.precise);
+  const [syncMessage, setSyncMessage] = useState("");
 
   useEffect(() => {
     let isCancelled = false;
@@ -164,7 +188,10 @@ export function ReportComposer({
 
     setSubmitState("saving");
 
-    const {coordinates, source} = await resolveCoordinates();
+    const manualCoordinates = selectedCoordinates;
+    const {coordinates, source} = manualCoordinates
+      ? {coordinates: manualCoordinates, source: "manual" as const}
+      : await resolveCoordinates();
     const createdAt = Date.now();
     const localReport: LocalReportRecord = {
       id: `local-${createdAt}`,
@@ -188,23 +215,32 @@ export function ReportComposer({
     setNote("");
     setSubmitState("saved");
     setLocationMessage(
-      source === "precise"
-        ? locationLabels.precise
-        : source === "blocked"
-          ? locationLabels.blocked
-          : locationLabels.fallback
+      source === "manual"
+        ? locationLabels.manual
+        : source === "precise"
+          ? locationLabels.precise
+          : source === "blocked"
+            ? locationLabels.blocked
+            : locationLabels.fallback
     );
     onCreateLocalReport(localReport);
+    onClearCoordinatePick();
 
-    const sharedSaved = await onCreateSharedReport?.({
-      reportTypeKey: activeChip.id,
-      note: note.trim(),
-      coordinates
-    });
+    const sharedSaveResult =
+      (await onCreateSharedReport?.({
+        reportTypeKey: activeChip.id,
+        note: note.trim(),
+        coordinates
+      })) ?? "unavailable";
 
-    if (sharedSaved) {
+    if (sharedSaveResult === "shared") {
       await appDb.localReports.delete(localReport.id);
       onRemoveLocalReport?.(localReport.id);
+      setSyncMessage(syncLabels.sharedSaved);
+    } else if (sharedSaveResult === "auth-required") {
+      setSyncMessage(syncLabels.authRequired);
+    } else {
+      setSyncMessage(syncLabels.unavailable);
     }
 
     window.setTimeout(() => setSubmitState("idle"), 1800);
@@ -239,7 +275,21 @@ export function ReportComposer({
         <p className="field-note">{safetyNote}</p>
         <span>{note.length}/120</span>
       </div>
+      <div className="button-row inline-control-row">
+        <button className="secondary-button" type="button" onClick={onStartCoordinatePick}>
+          {selectedCoordinates ? mapPickLabels.change : mapPickLabels.start}
+        </button>
+        {selectedCoordinates ? (
+          <button className="ghost-button" type="button" onClick={onClearCoordinatePick}>
+            {mapPickLabels.clear}
+          </button>
+        ) : null}
+      </div>
+      {isPickingCoordinates ? (
+        <p className="field-note location-note">{mapPickLabels.active}</p>
+      ) : null}
       <p className="field-note location-note">{locationMessage}</p>
+      {syncMessage ? <p className="field-note location-note">{syncMessage}</p> : null}
       <button className="primary-button" type="button" onClick={handleSubmit}>
         {submitState === "saving"
           ? savingLabel

@@ -18,6 +18,19 @@ type LiveMapProps = {
   onGpsStateChange?: (
     value: "idle" | "locating" | "active" | "blocked" | "unsupported"
   ) => void;
+  picker: {
+    isActive: boolean;
+    selectedCoordinates: [number, number] | null;
+    onPickCoordinates: (coordinates: [number, number]) => void;
+  };
+  places: {
+    id: string;
+    title: string;
+    categoryKey: string;
+    description: string;
+    sourceKind: string;
+    coordinates: [number, number];
+  }[];
   theme: {
     accent: string;
     previewPath: [number, number][];
@@ -70,6 +83,8 @@ export function LiveMap({
   mode,
   meetup,
   onGpsStateChange,
+  picker,
+  places,
   theme,
   reports
 }: LiveMapProps) {
@@ -77,7 +92,9 @@ export function LiveMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker[]>([]);
+  const placeMarkerRef = useRef<maplibregl.Marker[]>([]);
   const riderMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const pickerMarkerRef = useRef<maplibregl.Marker | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
     "loading"
   );
@@ -153,8 +170,12 @@ export function LiveMap({
     return () => {
       markerRef.current.forEach((marker) => marker.remove());
       markerRef.current = [];
+      placeMarkerRef.current.forEach((marker) => marker.remove());
+      placeMarkerRef.current = [];
       riderMarkerRef.current?.remove();
       riderMarkerRef.current = null;
+      pickerMarkerRef.current?.remove();
+      pickerMarkerRef.current = null;
       map.remove();
       mapRef.current = null;
     };
@@ -300,6 +321,19 @@ export function LiveMap({
           .addTo(map);
       });
 
+      placeMarkerRef.current.forEach((marker) => marker.remove());
+      placeMarkerRef.current = places.map((place) => {
+        const element = document.createElement("button");
+        element.className = `place-pin place-pin-${place.categoryKey}`;
+        element.type = "button";
+        element.setAttribute("aria-label", place.title);
+        element.innerHTML = "<span></span>";
+
+        return new maplibregl.Marker({element})
+          .setLngLat(place.coordinates)
+          .addTo(map);
+      });
+
       const bounds = theme.previewPath.reduce(
         (accumulator, coordinate) => accumulator.extend(coordinate),
         new maplibregl.LngLatBounds(theme.previewPath[0], theme.previewPath[0])
@@ -307,6 +341,7 @@ export function LiveMap({
 
       bounds.extend(meetup.coordinates);
       reports.forEach((report) => bounds.extend(report.coordinates));
+      places.forEach((place) => bounds.extend(place.coordinates));
 
       const compactViewport = window.innerWidth <= 720;
 
@@ -335,7 +370,7 @@ export function LiveMap({
     }
 
     map.once("load", syncMap);
-  }, [meetup.coordinates, mode, reports, theme.previewPath]);
+  }, [meetup.coordinates, mode, places, reports, theme.previewPath]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -528,6 +563,70 @@ export function LiveMap({
   }, [mode]);
 
   useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const pickerHandler = (event: maplibregl.MapMouseEvent) => {
+      if (!picker.isActive) {
+        return;
+      }
+
+      picker.onPickCoordinates([event.lngLat.lng, event.lngLat.lat]);
+    };
+
+    map.on("click", pickerHandler);
+
+    return () => {
+      map.off("click", pickerHandler);
+    };
+  }, [picker]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    if (!picker.selectedCoordinates) {
+      pickerMarkerRef.current?.remove();
+      pickerMarkerRef.current = null;
+      map.getCanvas().style.cursor = "";
+      return;
+    }
+
+    const markerElement = document.createElement("div");
+    markerElement.className = "picker-pin";
+    pickerMarkerRef.current?.remove();
+    pickerMarkerRef.current = new maplibregl.Marker({element: markerElement})
+      .setLngLat(picker.selectedCoordinates)
+      .addTo(map);
+
+    map.getCanvas().style.cursor = picker.isActive ? "crosshair" : "";
+
+    return () => {
+      map.getCanvas().style.cursor = "";
+    };
+  }, [picker.isActive, picker.selectedCoordinates]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    map.getCanvas().style.cursor = picker.isActive ? "crosshair" : "";
+
+    return () => {
+      map.getCanvas().style.cursor = "";
+    };
+  }, [picker.isActive]);
+
+  useEffect(() => {
     if (locateRequestCount === 0) {
       return;
     }
@@ -603,6 +702,7 @@ export function LiveMap({
         <strong>{statusLabel}</strong>
         <span>{statusDetail}</span>
       </div>
+      {picker.isActive ? <div className="map-picker-hint">Click the map to place the pin.</div> : null}
       <div
         className={`live-map ${status === "ready" ? "is-ready" : ""}`}
         ref={containerRef}

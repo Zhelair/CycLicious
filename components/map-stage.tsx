@@ -38,6 +38,24 @@ type MapStageProps = {
     title: string;
     coordinates: [number, number];
   };
+  places: {
+    id: string;
+    title: string;
+    categoryKey: string;
+    description: string;
+    sourceKind: string;
+    coordinates: [number, number];
+  }[];
+  picker: {
+    isActive: boolean;
+    labels: {
+      idle: string;
+      active: string;
+      picked: string;
+    };
+    selectedCoordinates: [number, number] | null;
+    onPickCoordinates: (coordinates: [number, number]) => void;
+  };
   onOpenRoutes: () => void;
   onOpenSocial: () => void;
   onToggleExpanded: () => void;
@@ -67,6 +85,8 @@ export function MapStage({
   mode,
   metaLabels,
   meetup,
+  places,
+  picker,
   onOpenRoutes,
   onOpenSocial,
   onToggleExpanded,
@@ -98,6 +118,8 @@ export function MapStage({
         meetup={meetup}
         mode={mode}
         onGpsStateChange={setGpsState}
+        places={places}
+        picker={picker}
         reports={reports}
         theme={theme}
       />
@@ -134,7 +156,13 @@ export function MapStage({
       </div>
       <div className="map-overlay top-right">
         <div className="map-signal-stack">
-          <span className="map-pill">{metaLabels.freshSignals}</span>
+          <span className="map-pill">
+            {picker.isActive
+              ? picker.labels.active
+              : picker.selectedCoordinates
+                ? picker.labels.picked
+                : metaLabels.freshSignals}
+          </span>
           {liveReports.map((report) => (
             <article className="map-signal-inline-card" key={report.id}>
               <span className={`signal-badge severity-${report.severity.toLowerCase()}`}>
