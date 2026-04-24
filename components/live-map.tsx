@@ -23,6 +23,14 @@ type LiveMapProps = {
     selectedCoordinates: [number, number] | null;
     onPickCoordinates: (coordinates: [number, number]) => void;
   };
+  places: {
+    id: string;
+    title: string;
+    categoryKey: string;
+    description: string;
+    sourceKind: string;
+    coordinates: [number, number];
+  }[];
   theme: {
     accent: string;
     previewPath: [number, number][];
@@ -76,6 +84,7 @@ export function LiveMap({
   meetup,
   onGpsStateChange,
   picker,
+  places,
   theme,
   reports
 }: LiveMapProps) {
@@ -83,6 +92,7 @@ export function LiveMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker[]>([]);
+  const placeMarkerRef = useRef<maplibregl.Marker[]>([]);
   const riderMarkerRef = useRef<maplibregl.Marker | null>(null);
   const pickerMarkerRef = useRef<maplibregl.Marker | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
@@ -160,6 +170,8 @@ export function LiveMap({
     return () => {
       markerRef.current.forEach((marker) => marker.remove());
       markerRef.current = [];
+      placeMarkerRef.current.forEach((marker) => marker.remove());
+      placeMarkerRef.current = [];
       riderMarkerRef.current?.remove();
       riderMarkerRef.current = null;
       pickerMarkerRef.current?.remove();
@@ -309,6 +321,19 @@ export function LiveMap({
           .addTo(map);
       });
 
+      placeMarkerRef.current.forEach((marker) => marker.remove());
+      placeMarkerRef.current = places.map((place) => {
+        const element = document.createElement("button");
+        element.className = `place-pin place-pin-${place.categoryKey}`;
+        element.type = "button";
+        element.setAttribute("aria-label", place.title);
+        element.innerHTML = "<span></span>";
+
+        return new maplibregl.Marker({element})
+          .setLngLat(place.coordinates)
+          .addTo(map);
+      });
+
       const bounds = theme.previewPath.reduce(
         (accumulator, coordinate) => accumulator.extend(coordinate),
         new maplibregl.LngLatBounds(theme.previewPath[0], theme.previewPath[0])
@@ -316,6 +341,7 @@ export function LiveMap({
 
       bounds.extend(meetup.coordinates);
       reports.forEach((report) => bounds.extend(report.coordinates));
+      places.forEach((place) => bounds.extend(place.coordinates));
 
       const compactViewport = window.innerWidth <= 720;
 
@@ -344,7 +370,7 @@ export function LiveMap({
     }
 
     map.once("load", syncMap);
-  }, [meetup.coordinates, mode, reports, theme.previewPath]);
+  }, [meetup.coordinates, mode, places, reports, theme.previewPath]);
 
   useEffect(() => {
     const map = mapRef.current;

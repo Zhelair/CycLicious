@@ -42,6 +42,17 @@
     "meetupOverlay": "Meetup pin",
     "reportTitle": "Quick report",
     "reportSubtitle": "Structured reports keep the map useful, fast and easier to moderate.",
+    "placeTitle": "Add a place",
+    "placeSubtitle": "Suggest a useful cycling spot with an exact pin so it can be reviewed for the shared map.",
+    "placeNameLabel": "Place name",
+    "placeNamePlaceholder": "Example: fountain by the park gate",
+    "placeNoteLabel": "Short note",
+    "placeNotePlaceholder": "Add what riders should know about this place...",
+    "placeCategoryLabel": "Place type",
+    "placeSubmit": "Send for review",
+    "placeSaving": "Sending...",
+    "placeSaved": "Sent",
+    "placeSafetyNote": "Community places should be specific, useful and safe to publish after moderation.",
     "notePlaceholder": "Example: parked car blocks the lane, pass only on the sidewalk...",
     "submitReport": "Save locally",
     "savingReport": "Saving...",
@@ -70,6 +81,19 @@
       "clear": "Clear pin",
       "active": "Pin mode is active. Click the map for exact placement.",
       "picked": "Map pin selected"
+    },
+    "placeMapPick": {
+      "start": "Pick place on map",
+      "change": "Change place pin",
+      "clear": "Clear place pin",
+      "active": "Place pin mode is active. Click the map for exact placement.",
+      "picked": "Place pin selected",
+      "required": "Choose an exact point on the map before submitting the place."
+    },
+    "placeResult": {
+      "submitted": "Place submitted for review. It will appear after moderation.",
+      "authRequired": "Sign in before sending a community place to the shared map.",
+      "unavailable": "Place submission is unavailable right now."
     },
     "reportSync": {
       "sharedSaved": "Saved on device and published to the shared map.",
@@ -111,6 +135,8 @@
       "reports": "Reports",
       "meetups": "Meetups",
       "transit": "Transit",
+      "placesTitle": "Map places",
+      "placesSubtitle": "Approved permanent and official places that help the city map stay useful.",
       "openSocial": "Open social"
     },
     "transit": {
@@ -208,6 +234,11 @@
     "afterRide": "Finish with drinks, snacks and bike parking nearby",
     "lateNightRecovery": "Late-night loop with a shkembe chorba ending",
     "summerEscape": "Cooler, greener profile for hot days",
+    "bikeParking": "Bike parking",
+    "repairStop": "Repair stop",
+    "coffeeStop": "Coffee stop",
+    "waterPoint": "Water point",
+    "quietConnector": "Quiet connector",
     "lowStress": "Low stress",
     "balanced": "Balanced",
     "chill": "Chill",
