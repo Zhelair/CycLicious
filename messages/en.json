@@ -162,6 +162,35 @@
     "meetups": {
       "southParkRide": "After-work South Park ride",
       "meetupNote": "The exact meeting pin appears after approval. Instagram or Telegram reveal should stay optional and mutual."
+    },
+    "meetupTitle": "Create a meetup",
+    "meetupSubtitle": "Drop an exact pin, set the time and publish a ride plan that can be reviewed later.",
+    "meetupNameLabel": "Meetup title",
+    "meetupNamePlaceholder": "Example: easy evening lap from South Park",
+    "meetupWhenLabel": "When",
+    "meetupAreaLabel": "Area note",
+    "meetupAreaPlaceholder": "Example: fountain by the main entrance",
+    "meetupPaceLabel": "Pace",
+    "meetupPacePlaceholder": "Example: steady social pace",
+    "meetupNoteLabel": "Short note",
+    "meetupNotePlaceholder": "Add what riders should expect, bring or know before joining...",
+    "meetupVisibilityLabel": "Visibility",
+    "meetupSubmit": "Publish meetup",
+    "meetupSaving": "Publishing...",
+    "meetupSaved": "Published",
+    "meetupComposerSafetyNote": "Meetups should use public locations and clear timing so riders can decide safely.",
+    "meetupMapPick": {
+      "start": "Pick meetup on map",
+      "change": "Change meetup pin",
+      "clear": "Clear meetup pin",
+      "active": "Meetup pin mode is active. Click the map for exact placement.",
+      "picked": "Meetup pin selected",
+      "required": "Choose an exact point on the map before publishing the meetup."
+    },
+    "meetupResult": {
+      "submitted": "Meetup published to the shared map.",
+      "authRequired": "Sign in before publishing a meetup to the shared map.",
+      "unavailable": "Meetup publishing is unavailable right now."
     }
   },
   "reportTypes": {
@@ -246,8 +275,10 @@
     "coolerRide": "Cooler ride",
     "unlistedLink": "Unlisted link",
     "todayAt1930": "Today, 19:30",
-    "steadySocial": "Steady social pace"
-    ,
-    "beta": "Beta"
+    "steadySocial": "Steady social pace",
+    "beta": "Beta",
+    "public": "Public",
+    "unlisted": "Unlisted",
+    "private": "Private"
   }
 }

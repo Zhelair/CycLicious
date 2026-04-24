@@ -98,6 +98,42 @@ export default async function LocaleHomePage({
           unavailable: t("placeResult.unavailable")
         }
       }}
+      meetupForm={{
+        title: t("meetupTitle"),
+        subtitle: t("meetupSubtitle"),
+        meetupTitleLabel: t("meetupNameLabel"),
+        meetupTitlePlaceholder: t("meetupNamePlaceholder"),
+        whenLabel: t("meetupWhenLabel"),
+        areaLabel: t("meetupAreaLabel"),
+        areaPlaceholder: t("meetupAreaPlaceholder"),
+        paceLabel: t("meetupPaceLabel"),
+        pacePlaceholder: t("meetupPacePlaceholder"),
+        noteLabel: t("meetupNoteLabel"),
+        notePlaceholder: t("meetupNotePlaceholder"),
+        visibilityLabel: t("meetupVisibilityLabel"),
+        visibilityOptions: [
+          {id: "public", label: miscT("public")},
+          {id: "unlisted", label: miscT("unlisted")},
+          {id: "private", label: miscT("private")}
+        ],
+        submitLabel: t("meetupSubmit"),
+        savingLabel: t("meetupSaving"),
+        savedLabel: t("meetupSaved"),
+        safetyNote: t("meetupComposerSafetyNote"),
+        pickerLabels: {
+          start: t("meetupMapPick.start"),
+          change: t("meetupMapPick.change"),
+          clear: t("meetupMapPick.clear"),
+          active: t("meetupMapPick.active"),
+          picked: t("meetupMapPick.picked"),
+          required: t("meetupMapPick.required")
+        },
+        resultLabels: {
+          submitted: t("meetupResult.submitted"),
+          authRequired: t("meetupResult.authRequired"),
+          unavailable: t("meetupResult.unavailable")
+        }
+      }}
       reportForm={{
         title: t("reportTitle"),
         subtitle: t("reportSubtitle"),

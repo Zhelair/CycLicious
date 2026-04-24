@@ -1,10 +1,11 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import {useTranslations} from "next-intl";
+import {useLocale, useTranslations} from "next-intl";
 
 import {appDb, type LocalReportRecord} from "../lib/db/app-db";
 import {ModeToggle} from "./mode-toggle";
+import {MeetupComposer, type MeetupSaveResult} from "./meetup-composer";
 import {PlaceComposer, type PlaceSaveResult} from "./place-composer";
 import {ReportComposer, type SharedReportSaveResult} from "./report-composer";
 import {MapStage} from "./map-stage";
@@ -15,6 +16,7 @@ import {LegalConsentGate} from "./legal-consent-gate";
 import type {ReportCategoryKey, ReportTypeKey} from "../lib/data/report-presets";
 import type {ReportSeverity} from "../lib/data/reports";
 import {seededPlaces, type PlaceCategoryKey} from "../lib/data/places";
+import {normalizeSharedMeetup, type SharedMeetupRecord} from "../lib/supabase/meetups";
 import {normalizeSharedReport, type SharedReportRecord} from "../lib/supabase/reports";
 import {normalizeSharedPlace as normalizeSharedPlaceRecord, type SharedPlaceRecord as SharedPlaceRecordType} from "../lib/supabase/places";
 import {getSupabaseBrowserClient} from "../lib/supabase/browser";
@@ -82,6 +84,41 @@ type AppShellProps = {
       id: PlaceCategoryKey;
       label: string;
     }[];
+    pickerLabels: {
+      start: string;
+      change: string;
+      clear: string;
+      active: string;
+      picked: string;
+      required: string;
+    };
+    resultLabels: {
+      submitted: string;
+      authRequired: string;
+      unavailable: string;
+    };
+  };
+  meetupForm: {
+    title: string;
+    subtitle: string;
+    meetupTitleLabel: string;
+    meetupTitlePlaceholder: string;
+    whenLabel: string;
+    areaLabel: string;
+    areaPlaceholder: string;
+    paceLabel: string;
+    pacePlaceholder: string;
+    noteLabel: string;
+    notePlaceholder: string;
+    visibilityLabel: string;
+    visibilityOptions: {
+      id: "public" | "unlisted" | "private";
+      label: string;
+    }[];
+    submitLabel: string;
+    savingLabel: string;
+    savedLabel: string;
+    safetyNote: string;
     pickerLabels: {
       start: string;
       change: string;
@@ -175,6 +212,7 @@ export function AppShell({
   metaLabels,
   labels,
   placeForm,
+  meetupForm,
   reportForm,
   meetup,
   transit,
@@ -182,6 +220,7 @@ export function AppShell({
   themeCards,
   reports
 }: AppShellProps) {
+  const locale = useLocale();
   const homeT = useTranslations("home");
   const reportT = useTranslations("reportTypes");
   const miscT = useTranslations("misc");
@@ -190,8 +229,10 @@ export function AppShell({
   const [selectedThemeId, setSelectedThemeId] = useState(themeCards[0]?.id ?? "");
   const [localReports, setLocalReports] = useState<LocalReportRecord[]>([]);
   const [sharedReports, setSharedReports] = useState<SharedReportRecord[]>([]);
+  const [sharedMeetups, setSharedMeetups] = useState<SharedMeetupRecord[]>([]);
   const [sharedPlaces, setSharedPlaces] = useState<SharedPlaceRecordType[]>([]);
   const [hasLoadedSharedReports, setHasLoadedSharedReports] = useState(false);
+  const [hasLoadedSharedMeetups, setHasLoadedSharedMeetups] = useState(false);
   const [hasLoadedSharedPlaces, setHasLoadedSharedPlaces] = useState(false);
   const [mapWindowMode, setMapWindowMode] = useState<"split" | "focus">("split");
   const [reportPickerCoordinates, setReportPickerCoordinates] = useState<[number, number] | null>(
@@ -202,6 +243,10 @@ export function AppShell({
     null
   );
   const [isPickingPlaceCoordinates, setIsPickingPlaceCoordinates] = useState(false);
+  const [meetupPickerCoordinates, setMeetupPickerCoordinates] = useState<[number, number] | null>(
+    null
+  );
+  const [isPickingMeetupCoordinates, setIsPickingMeetupCoordinates] = useState(false);
   const [preferencesReady, setPreferencesReady] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
 
@@ -361,6 +406,37 @@ export function AppShell({
   useEffect(() => {
     let isCancelled = false;
 
+    const loadSharedMeetups = async () => {
+      try {
+        const response = await fetch("/api/meetups", {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as {data?: SharedMeetupRecord[]};
+
+        if (!isCancelled && Array.isArray(payload.data)) {
+          setSharedMeetups(payload.data);
+          setHasLoadedSharedMeetups(true);
+        }
+      } catch {
+        // Keep the seeded meetup when the backend is not configured yet.
+      }
+    };
+
+    void loadSharedMeetups();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+
     const loadSharedReports = async () => {
       try {
         const response = await fetch("/api/reports", {
@@ -432,6 +508,37 @@ export function AppShell({
   const mergedPlaces = hasLoadedSharedPlaces
     ? sharedPlaces.map(normalizeSharedPlaceRecord)
     : seededPlaces;
+  const normalizedSharedMeetups = hasLoadedSharedMeetups
+    ? sharedMeetups.map(normalizeSharedMeetup)
+    : [];
+  const primarySharedMeetup = normalizedSharedMeetups.find((entry) => entry.coordinates !== null);
+  const sharedMeetupDate = primarySharedMeetup
+    ? new Date(primarySharedMeetup.scheduledFor)
+    : null;
+  const displayedMeetup =
+    primarySharedMeetup?.coordinates && sharedMeetupDate && !Number.isNaN(sharedMeetupDate.getTime())
+      ? {
+          title: primarySharedMeetup.title,
+          visibility: miscT(primarySharedMeetup.visibility),
+          when: new Intl.DateTimeFormat(locale, {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          }).format(sharedMeetupDate),
+          pace: primarySharedMeetup.paceLabel || meetup.pace,
+          attendees: meetup.attendees,
+          note:
+            [primarySharedMeetup.areaLabel, primarySharedMeetup.note]
+              .filter((value) => value.length > 0)
+              .join(" • ") || meetup.note,
+          safetyNote: meetup.safetyNote,
+          joinLabel: meetup.joinLabel,
+          maybeLabel: meetup.maybeLabel,
+          shareLabel: meetup.shareLabel,
+          coordinates: primarySharedMeetup.coordinates
+        }
+      : meetup;
   const pulseReports = mergedReports.slice(0, 4);
   const pulsePlaces = mergedPlaces.slice(0, 4);
   const weeklyStats = [
@@ -442,19 +549,33 @@ export function AppShell({
   const mapIsFocused = mapWindowMode === "focus";
   const activePicker =
     activeTab === "social"
-      ? {
-          isActive: isPickingPlaceCoordinates,
-          labels: {
-            idle: placeForm.pickerLabels.start,
-            active: placeForm.pickerLabels.active,
-            picked: placeForm.pickerLabels.picked
-          },
-          selectedCoordinates: placePickerCoordinates,
-          onPickCoordinates: (coordinates: [number, number]) => {
-            setPlacePickerCoordinates(coordinates);
-            setIsPickingPlaceCoordinates(false);
+      ? isPickingMeetupCoordinates || meetupPickerCoordinates
+        ? {
+            isActive: isPickingMeetupCoordinates,
+            labels: {
+              idle: meetupForm.pickerLabels.start,
+              active: meetupForm.pickerLabels.active,
+              picked: meetupForm.pickerLabels.picked
+            },
+            selectedCoordinates: meetupPickerCoordinates,
+            onPickCoordinates: (coordinates: [number, number]) => {
+              setMeetupPickerCoordinates(coordinates);
+              setIsPickingMeetupCoordinates(false);
+            }
           }
-        }
+        : {
+            isActive: isPickingPlaceCoordinates,
+            labels: {
+              idle: placeForm.pickerLabels.start,
+              active: placeForm.pickerLabels.active,
+              picked: placeForm.pickerLabels.picked
+            },
+            selectedCoordinates: placePickerCoordinates,
+            onPickCoordinates: (coordinates: [number, number]) => {
+              setPlacePickerCoordinates(coordinates);
+              setIsPickingPlaceCoordinates(false);
+            }
+          }
       : {
           isActive: isPickingReportCoordinates,
           labels: {
@@ -527,6 +648,81 @@ export function AppShell({
       setHasLoadedSharedReports(true);
       setSharedReports((current) => [payload.data!, ...current]);
       return "shared";
+    } catch {
+      return "unavailable";
+    }
+  };
+  const createMeetup = async ({
+    title,
+    note,
+    visibility,
+    paceLabel,
+    scheduledFor,
+    areaLabel,
+    coordinates
+  }: {
+    title: string;
+    note: string;
+    visibility: "public" | "unlisted" | "private";
+    paceLabel: string;
+    scheduledFor: string;
+    areaLabel: string;
+    coordinates: [number, number];
+  }): Promise<MeetupSaveResult> => {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      return "unavailable";
+    }
+
+    const {
+      data: {session}
+    } = await supabase.auth.getSession();
+    const accessToken = session?.access_token;
+
+    if (!accessToken) {
+      return "auth-required";
+    }
+
+    try {
+      const response = await fetch("/api/meetups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          title,
+          note,
+          visibility,
+          paceLabel,
+          scheduledFor,
+          areaLabel,
+          coordinates
+        })
+      });
+
+      if (response.status === 401) {
+        return "auth-required";
+      }
+
+      if (response.status === 503) {
+        return "unavailable";
+      }
+
+      if (!response.ok) {
+        return "unavailable";
+      }
+
+      const payload = (await response.json()) as {data?: SharedMeetupRecord};
+
+      if (!payload.data) {
+        return "unavailable";
+      }
+
+      setHasLoadedSharedMeetups(true);
+      setSharedMeetups((current) => [payload.data!, ...current]);
+      return "submitted";
     } catch {
       return "unavailable";
     }
@@ -634,7 +830,7 @@ export function AppShell({
               featuredReports={pulseReports}
               labels={labels}
               metaLabels={metaLabels}
-              meetup={meetup}
+              meetup={displayedMeetup}
               mode={mode}
               picker={activePicker}
               places={mergedPlaces}
@@ -674,6 +870,9 @@ export function AppShell({
                 }}
                 onStartCoordinatePick={() => {
                   setMapWindowMode("focus");
+                  setIsPickingPlaceCoordinates(false);
+                  setMeetupPickerCoordinates(null);
+                  setIsPickingMeetupCoordinates(false);
                   setIsPickingReportCoordinates(true);
                 }}
                 selectedCoordinates={reportPickerCoordinates}
@@ -817,7 +1016,7 @@ export function AppShell({
             featuredReports={pulseReports}
             labels={labels}
             metaLabels={metaLabels}
-            meetup={meetup}
+            meetup={displayedMeetup}
             mode={mode}
             picker={activePicker}
             places={mergedPlaces}
@@ -885,7 +1084,7 @@ export function AppShell({
             featuredReports={pulseReports}
             labels={labels}
             metaLabels={metaLabels}
-            meetup={meetup}
+            meetup={displayedMeetup}
             mode={mode}
             picker={activePicker}
             places={mergedPlaces}
@@ -907,11 +1106,11 @@ export function AppShell({
               <div className="summary-metrics">
                 <article className="summary-stat">
                   <span>{homeT("socialHub.reports")}</span>
-                  <strong>{reportForm.chipOptions.length}</strong>
+                  <strong>{mergedReports.length}</strong>
                 </article>
                 <article className="summary-stat">
                   <span>{homeT("socialHub.meetups")}</span>
-                  <strong>1</strong>
+                  <strong>{hasLoadedSharedMeetups ? sharedMeetups.length : 1}</strong>
                 </article>
                 <article className="summary-stat">
                   <span>{homeT("socialHub.transit")}</span>
@@ -919,6 +1118,23 @@ export function AppShell({
                 </article>
               </div>
             </section>
+
+            <MeetupComposer
+              {...meetupForm}
+              isPickingCoordinates={isPickingMeetupCoordinates}
+              onClearCoordinatePick={() => {
+                setMeetupPickerCoordinates(null);
+                setIsPickingMeetupCoordinates(false);
+              }}
+              onCreateMeetup={createMeetup}
+              onStartCoordinatePick={() => {
+                setMapWindowMode("focus");
+                setPlacePickerCoordinates(null);
+                setIsPickingPlaceCoordinates(false);
+                setIsPickingMeetupCoordinates(true);
+              }}
+              selectedCoordinates={meetupPickerCoordinates}
+            />
 
             <PlaceComposer
               {...placeForm}
@@ -930,6 +1146,8 @@ export function AppShell({
               onCreatePlace={createPlace}
               onStartCoordinatePick={() => {
                 setMapWindowMode("focus");
+                setMeetupPickerCoordinates(null);
+                setIsPickingMeetupCoordinates(false);
                 setIsPickingPlaceCoordinates(true);
               }}
               selectedCoordinates={placePickerCoordinates}
@@ -961,7 +1179,7 @@ export function AppShell({
                 shareUnavailable: labels.meetupShareUnavailable
               }}
               labels={metaLabels}
-              {...meetup}
+              {...displayedMeetup}
             />
             <TransitRulesCard {...transit} />
           </div>
