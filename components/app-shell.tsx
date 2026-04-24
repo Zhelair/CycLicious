@@ -5,7 +5,10 @@ import {useTranslations} from "next-intl";
 
 import {appDb, type LocalReportRecord} from "../lib/db/app-db";
 import {ModeToggle} from "./mode-toggle";
+<<<<<<< HEAD
 import {PlaceComposer, type PlaceSaveResult} from "./place-composer";
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
 import {ReportComposer, type SharedReportSaveResult} from "./report-composer";
 import {MapStage} from "./map-stage";
 import {MeetupCard} from "./meetup-card";
@@ -16,7 +19,10 @@ import type {ReportCategoryKey, ReportTypeKey} from "../lib/data/report-presets"
 import type {ReportSeverity} from "../lib/data/reports";
 import {seededPlaces, type PlaceCategoryKey} from "../lib/data/places";
 import {normalizeSharedReport, type SharedReportRecord} from "../lib/supabase/reports";
+<<<<<<< HEAD
 import {normalizeSharedPlace as normalizeSharedPlaceRecord, type SharedPlaceRecord as SharedPlaceRecordType} from "../lib/supabase/places";
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
 import {getSupabaseBrowserClient} from "../lib/supabase/browser";
 
 type AppTab = "dashboard" | "routes" | "social";
@@ -65,6 +71,7 @@ type AppShellProps = {
     locationFallback: string;
     locationBlocked: string;
     locationManual: string;
+<<<<<<< HEAD
   };
   placeForm: {
     title: string;
@@ -95,6 +102,8 @@ type AppShellProps = {
       authRequired: string;
       unavailable: string;
     };
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   };
   reportForm: {
     title: string;
@@ -198,10 +207,13 @@ export function AppShell({
     null
   );
   const [isPickingReportCoordinates, setIsPickingReportCoordinates] = useState(false);
+<<<<<<< HEAD
   const [placePickerCoordinates, setPlacePickerCoordinates] = useState<[number, number] | null>(
     null
   );
   const [isPickingPlaceCoordinates, setIsPickingPlaceCoordinates] = useState(false);
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   const [preferencesReady, setPreferencesReady] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
 
@@ -440,6 +452,7 @@ export function AppShell({
     {label: homeT("weekly.calmKm"), value: "42 km"}
   ];
   const mapIsFocused = mapWindowMode === "focus";
+<<<<<<< HEAD
   const activePicker =
     activeTab === "social"
       ? {
@@ -468,6 +481,8 @@ export function AppShell({
             setIsPickingReportCoordinates(false);
           }
         };
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   const createSharedReport = async ({
     reportTypeKey,
     note,
@@ -531,6 +546,7 @@ export function AppShell({
       return "unavailable";
     }
   };
+<<<<<<< HEAD
   const createPlace = async ({
     title,
     categoryKey,
@@ -589,6 +605,8 @@ export function AppShell({
       return "unavailable";
     }
   };
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
 
   if (!selectedTheme) {
     return null;
@@ -636,8 +654,24 @@ export function AppShell({
               metaLabels={metaLabels}
               meetup={meetup}
               mode={mode}
+<<<<<<< HEAD
               picker={activePicker}
               places={mergedPlaces}
+=======
+              picker={{
+                isActive: isPickingReportCoordinates,
+                labels: {
+                  idle: reportForm.mapPickLabels.start,
+                  active: reportForm.mapPickLabels.active,
+                  picked: reportForm.mapPickLabels.picked
+                },
+                selectedCoordinates: reportPickerCoordinates,
+                onPickCoordinates: (coordinates) => {
+                  setReportPickerCoordinates(coordinates);
+                  setIsPickingReportCoordinates(false);
+                }
+              }}
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
               onOpenRoutes={() => setActiveTab("routes")}
               onOpenSocial={() => setActiveTab("social")}
               onToggleExpanded={() =>
@@ -819,8 +853,24 @@ export function AppShell({
             metaLabels={metaLabels}
             meetup={meetup}
             mode={mode}
+<<<<<<< HEAD
             picker={activePicker}
             places={mergedPlaces}
+=======
+            picker={{
+              isActive: isPickingReportCoordinates,
+              labels: {
+                idle: reportForm.mapPickLabels.start,
+                active: reportForm.mapPickLabels.active,
+                picked: reportForm.mapPickLabels.picked
+              },
+              selectedCoordinates: reportPickerCoordinates,
+              onPickCoordinates: (coordinates) => {
+                setReportPickerCoordinates(coordinates);
+                setIsPickingReportCoordinates(false);
+              }
+            }}
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
             onOpenRoutes={() => setActiveTab("routes")}
             onOpenSocial={() => setActiveTab("social")}
             onToggleExpanded={() =>

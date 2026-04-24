@@ -67,6 +67,7 @@ export default async function LocaleHomePage({
         locationFallback: t("reportLocation.fallback"),
         locationBlocked: t("reportLocation.blocked"),
         locationManual: t("reportLocation.manual")
+<<<<<<< HEAD
       }}
       placeForm={{
         title: t("placeTitle"),
@@ -97,6 +98,8 @@ export default async function LocaleHomePage({
           authRequired: t("placeResult.authRequired"),
           unavailable: t("placeResult.unavailable")
         }
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
       }}
       reportForm={{
         title: t("reportTitle"),

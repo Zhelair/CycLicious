@@ -82,6 +82,7 @@
       "active": "Pin mode is active. Click the map for exact placement.",
       "picked": "Map pin selected"
     },
+<<<<<<< HEAD
     "placeMapPick": {
       "start": "Pick place on map",
       "change": "Change place pin",
@@ -95,6 +96,8 @@
       "authRequired": "Sign in before sending a community place to the shared map.",
       "unavailable": "Place submission is unavailable right now."
     },
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
     "reportSync": {
       "sharedSaved": "Saved on device and published to the shared map.",
       "authRequired": "Saved on device. Sign in later to publish this report to the shared map.",

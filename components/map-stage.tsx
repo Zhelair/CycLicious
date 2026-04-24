@@ -38,6 +38,7 @@ type MapStageProps = {
     title: string;
     coordinates: [number, number];
   };
+<<<<<<< HEAD
   places: {
     id: string;
     title: string;
@@ -46,6 +47,8 @@ type MapStageProps = {
     sourceKind: string;
     coordinates: [number, number];
   }[];
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   picker: {
     isActive: boolean;
     labels: {
@@ -85,7 +88,10 @@ export function MapStage({
   mode,
   metaLabels,
   meetup,
+<<<<<<< HEAD
   places,
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   picker,
   onOpenRoutes,
   onOpenSocial,
@@ -118,7 +124,10 @@ export function MapStage({
         meetup={meetup}
         mode={mode}
         onGpsStateChange={setGpsState}
+<<<<<<< HEAD
         places={places}
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
         picker={picker}
         reports={reports}
         theme={theme}

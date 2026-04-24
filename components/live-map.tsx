@@ -23,6 +23,7 @@ type LiveMapProps = {
     selectedCoordinates: [number, number] | null;
     onPickCoordinates: (coordinates: [number, number]) => void;
   };
+<<<<<<< HEAD
   places: {
     id: string;
     title: string;
@@ -31,6 +32,8 @@ type LiveMapProps = {
     sourceKind: string;
     coordinates: [number, number];
   }[];
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   theme: {
     accent: string;
     previewPath: [number, number][];
@@ -84,7 +87,10 @@ export function LiveMap({
   meetup,
   onGpsStateChange,
   picker,
+<<<<<<< HEAD
   places,
+=======
+>>>>>>> 4fb1fa70f4cb1f2c1da90e74f12bfaed367cb1f2
   theme,
   reports
 }: LiveMapProps) {

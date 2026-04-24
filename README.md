@@ -69,6 +69,8 @@ The playful routes belong mainly to `Explore Mode`.
 - [UI Redesign Sprint](./docs/ui-redesign-sprint.md)
 - [Prototype QA Checklist](./docs/prototype-qa-checklist.md)
 - [Source Inventory](./docs/source-inventory.md)
+- [Real Data & Moderation Architecture](./docs/real-data-and-moderation-architecture.md)
+- [Routing Safety Model](./docs/routing-safety-model.md)
 - [Privacy & Security](./docs/privacy-security-architecture.md)
 - [Transit Integration](./docs/transit-integration-notes.md)
 - [Agent Prompts](./agents/fullstack-agent.md), [UX/UI](./agents/ux-ui-agent.md), [Security/QA](./agents/security-qa-agent.md), [Data Research](./agents/data-research-agent.md)
