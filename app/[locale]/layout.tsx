@@ -6,6 +6,7 @@ import {notFound} from "next/navigation";
 import {CitySwitcher} from "../../components/city-switcher";
 import {LocaleSwitcher} from "../../components/locale-switcher";
 import {PwaClientBridge} from "../../components/pwa-client-bridge";
+import {AuthPanel} from "../../components/auth-panel";
 import {locales, type Locale} from "../../lib/i18n/config";
 
 export default async function LocaleLayout({
@@ -49,6 +50,7 @@ export default async function LocaleLayout({
                 plannedLabel={cityT("planned")}
               />
               <div className="utility-strip">
+                <AuthPanel />
                 <Link className="header-link" href={`/${locale}/settings`}>
                   Settings
                 </Link>

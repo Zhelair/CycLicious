@@ -5,7 +5,7 @@ import {useTranslations} from "next-intl";
 
 import {appDb, type LocalReportRecord} from "../lib/db/app-db";
 import {ModeToggle} from "./mode-toggle";
-import {ReportComposer} from "./report-composer";
+import {ReportComposer, type SharedReportSaveResult} from "./report-composer";
 import {MapStage} from "./map-stage";
 import {MeetupCard} from "./meetup-card";
 import {ThemeRail} from "./theme-rail";
@@ -14,6 +14,7 @@ import {LegalConsentGate} from "./legal-consent-gate";
 import type {ReportCategoryKey, ReportTypeKey} from "../lib/data/report-presets";
 import type {ReportSeverity} from "../lib/data/reports";
 import {normalizeSharedReport, type SharedReportRecord} from "../lib/supabase/reports";
+import {getSupabaseBrowserClient} from "../lib/supabase/browser";
 
 type AppTab = "dashboard" | "routes" | "social";
 
@@ -60,6 +61,7 @@ type AppShellProps = {
     locationPrecise: string;
     locationFallback: string;
     locationBlocked: string;
+    locationManual: string;
   };
   reportForm: {
     title: string;
@@ -75,6 +77,18 @@ type AppShellProps = {
       severity: ReportSeverity;
       categoryKey: ReportCategoryKey;
     }[];
+    syncLabels: {
+      sharedSaved: string;
+      authRequired: string;
+      unavailable: string;
+    };
+    mapPickLabels: {
+      start: string;
+      change: string;
+      clear: string;
+      active: string;
+      picked: string;
+    };
   };
   meetup: {
     title: string;
@@ -144,6 +158,10 @@ export function AppShell({
   const [sharedReports, setSharedReports] = useState<SharedReportRecord[]>([]);
   const [hasLoadedSharedReports, setHasLoadedSharedReports] = useState(false);
   const [mapWindowMode, setMapWindowMode] = useState<"split" | "focus">("split");
+  const [reportPickerCoordinates, setReportPickerCoordinates] = useState<[number, number] | null>(
+    null
+  );
+  const [isPickingReportCoordinates, setIsPickingReportCoordinates] = useState(false);
   const [preferencesReady, setPreferencesReady] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
 
@@ -353,6 +371,69 @@ export function AppShell({
     {label: homeT("weekly.calmKm"), value: "42 km"}
   ];
   const mapIsFocused = mapWindowMode === "focus";
+  const createSharedReport = async ({
+    reportTypeKey,
+    note,
+    coordinates
+  }: {
+    reportTypeKey: ReportTypeKey;
+    note: string;
+    coordinates: [number, number];
+  }): Promise<SharedReportSaveResult> => {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      return "unavailable";
+    }
+
+    const {
+      data: {session}
+    } = await supabase.auth.getSession();
+    const accessToken = session?.access_token;
+
+    if (!accessToken) {
+      return "auth-required";
+    }
+
+    try {
+      const response = await fetch("/api/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          reportTypeKey,
+          note,
+          coordinates
+        })
+      });
+
+      if (response.status === 401) {
+        return "auth-required";
+      }
+
+      if (response.status === 503) {
+        return "unavailable";
+      }
+
+      if (!response.ok) {
+        return "unavailable";
+      }
+
+      const payload = (await response.json()) as {data?: SharedReportRecord};
+
+      if (!payload.data) {
+        return "unavailable";
+      }
+
+      setHasLoadedSharedReports(true);
+      setSharedReports((current) => [payload.data!, ...current]);
+      return "shared";
+    } catch {
+      return "unavailable";
+    }
+  };
 
   if (!selectedTheme) {
     return null;
@@ -400,6 +481,19 @@ export function AppShell({
               metaLabels={metaLabels}
               meetup={meetup}
               mode={mode}
+              picker={{
+                isActive: isPickingReportCoordinates,
+                labels: {
+                  idle: reportForm.mapPickLabels.start,
+                  active: reportForm.mapPickLabels.active,
+                  picked: reportForm.mapPickLabels.picked
+                },
+                selectedCoordinates: reportPickerCoordinates,
+                onPickCoordinates: (coordinates) => {
+                  setReportPickerCoordinates(coordinates);
+                  setIsPickingReportCoordinates(false);
+                }
+              }}
               onOpenRoutes={() => setActiveTab("routes")}
               onOpenSocial={() => setActiveTab("social")}
               onToggleExpanded={() =>
@@ -415,38 +509,15 @@ export function AppShell({
                 locationLabels={{
                   precise: labels.locationPrecise,
                   fallback: labels.locationFallback,
-                  blocked: labels.locationBlocked
+                  blocked: labels.locationBlocked,
+                  manual: labels.locationManual
                 }}
-                onCreateSharedReport={async ({reportTypeKey, note, coordinates}) => {
-                  try {
-                    const response = await fetch("/api/reports", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json"
-                      },
-                      body: JSON.stringify({
-                        reportTypeKey,
-                        note,
-                        coordinates
-                      })
-                    });
-
-                    if (!response.ok) {
-                      return false;
-                    }
-
-                    const payload = (await response.json()) as {data?: SharedReportRecord};
-
-                    if (!payload.data) {
-                      return false;
-                    }
-
-                    setHasLoadedSharedReports(true);
-                    setSharedReports((current) => [payload.data!, ...current]);
-                    return true;
-                  } catch {
-                    return false;
-                  }
+                mapPickLabels={reportForm.mapPickLabels}
+                isPickingCoordinates={isPickingReportCoordinates}
+                onCreateSharedReport={createSharedReport}
+                onClearCoordinatePick={() => {
+                  setReportPickerCoordinates(null);
+                  setIsPickingReportCoordinates(false);
                 }}
                 onCreateLocalReport={(report) => {
                   setLocalReports((current) => [
@@ -457,6 +528,11 @@ export function AppShell({
                 onRemoveLocalReport={(reportId) => {
                   setLocalReports((current) => current.filter((entry) => entry.id !== reportId));
                 }}
+                onStartCoordinatePick={() => {
+                  setMapWindowMode("focus");
+                  setIsPickingReportCoordinates(true);
+                }}
+                selectedCoordinates={reportPickerCoordinates}
               />
               <section className="panel-card shell-card">
                 <div className="panel-header">
@@ -599,6 +675,19 @@ export function AppShell({
             metaLabels={metaLabels}
             meetup={meetup}
             mode={mode}
+            picker={{
+              isActive: isPickingReportCoordinates,
+              labels: {
+                idle: reportForm.mapPickLabels.start,
+                active: reportForm.mapPickLabels.active,
+                picked: reportForm.mapPickLabels.picked
+              },
+              selectedCoordinates: reportPickerCoordinates,
+              onPickCoordinates: (coordinates) => {
+                setReportPickerCoordinates(coordinates);
+                setIsPickingReportCoordinates(false);
+              }
+            }}
             onOpenRoutes={() => setActiveTab("routes")}
             onOpenSocial={() => setActiveTab("social")}
             onToggleExpanded={() =>
