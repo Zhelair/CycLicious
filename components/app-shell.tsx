@@ -790,8 +790,34 @@ export function AppShell({
     return null;
   }
 
+  const tabItems = [
+    {id: "dashboard", label: homeT("tabs.dashboard")},
+    {id: "routes", label: homeT("tabs.routes")},
+    {id: "social", label: homeT("tabs.social")}
+  ] as {id: AppTab; label: string}[];
+
+  const mapStage = (
+    <MapStage
+      expanded={mapIsFocused}
+      featuredReports={pulseReports}
+      labels={labels}
+      metaLabels={metaLabels}
+      meetup={displayedMeetup}
+      mode={mode}
+      picker={activePicker}
+      places={mergedPlaces}
+      onOpenRoutes={() => setActiveTab("routes")}
+      onOpenSocial={() => setActiveTab("social")}
+      onToggleExpanded={() =>
+        setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
+      }
+      reports={mergedReports}
+      theme={selectedTheme}
+    />
+  );
+
   return (
-    <main className={`page-shell mode-${mode}`}>
+    <main className={`page-shell map-app-shell mode-${mode}`}>
       <LegalConsentGate />
       {mapIsFocused ? (
         <button
@@ -801,49 +827,72 @@ export function AppShell({
           onClick={() => setMapWindowMode("split")}
         />
       ) : null}
-      <nav className="section-tabs shell-card" aria-label={homeT("tabs.dashboard")}>
-        {([
-          {id: "dashboard", label: homeT("tabs.dashboard")},
-          {id: "routes", label: homeT("tabs.routes")},
-          {id: "social", label: homeT("tabs.social")}
-        ] as {id: AppTab; label: string}[]).map((tab) => (
-          <button
-            className={`section-tab ${activeTab === tab.id ? "active" : ""}`}
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-
-      {activeTab === "dashboard" ? (
-        <>
-          <section
-            className={`dashboard-grid tab-panel-grid dashboard-primary-grid ${
-              mapIsFocused ? "map-focused" : ""
-            }`}
-          >
-            <MapStage
-              expanded={mapIsFocused}
-              featuredReports={pulseReports}
-              labels={labels}
-              metaLabels={metaLabels}
-              meetup={displayedMeetup}
-              mode={mode}
-              picker={activePicker}
-              places={mergedPlaces}
-              onOpenRoutes={() => setActiveTab("routes")}
-              onOpenSocial={() => setActiveTab("social")}
-              onToggleExpanded={() =>
-                setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
-              }
-              reports={mergedReports}
-              theme={selectedTheme}
+      <section className={`map-app-frame ${mapIsFocused ? "map-focused" : ""}`}>
+        <aside className="map-app-sidebar" aria-label={homeT("tabs.dashboard")}>
+          <section className="map-sidebar-brand">
+            <div>
+              <span className="prototype-pill">{metaLabels.prototype}</span>
+              <p className="eyebrow">{hero.eyebrow}</p>
+              <h1>{hero.title}</h1>
+              <p className="hero-subtitle">{hero.subtitle}</p>
+            </div>
+            <ModeToggle
+              rideLabel={labels.rideMode}
+              exploreLabel={labels.exploreMode}
+              value={mode}
+              onChange={setMode}
             />
+          </section>
 
-            <div className="dashboard-sidebar">
+          <nav className="map-sidebar-tabs" aria-label={homeT("tabs.dashboard")}>
+            {tabItems.map((tab) => (
+              <button
+                className={activeTab === tab.id ? "active" : ""}
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="map-sidebar-scroll">
+            {activeTab === "dashboard" ? (
+              <>
+                <section className="map-sidebar-section">
+                  <div className="compact-stat-grid">
+                    {stats.map((stat) => (
+                      <article className="compact-stat" key={stat.label}>
+                        <span>{stat.label}</span>
+                        <strong>{stat.value}</strong>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="map-sidebar-section">
+                  <div className="panel-header">
+                    <h2>{homeT("quickSignalsTitle")}</h2>
+                    <p>{homeT("quickSignalsSubtitle")}</p>
+                  </div>
+                  <div className="signal-stack">
+                    {pulseReports.map((report) => (
+                      <article className="signal-card" key={report.id}>
+                        <span className={`signal-badge severity-${report.severity.toLowerCase()}`}>
+                          {report.severity}
+                        </span>
+                        <div>
+                          <strong>{report.title}</strong>
+                          <p>
+                            {report.confirmations}x | {report.ageMinutes}m
+                          </p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+
               <ReportComposer
                 {...reportForm}
                 locationLabels={{
@@ -877,314 +926,167 @@ export function AppShell({
                 }}
                 selectedCoordinates={reportPickerCoordinates}
               />
-              <section className="panel-card shell-card">
-                <div className="panel-header">
-                  <h2>{homeT("quickSignalsTitle")}</h2>
-                  <p>{homeT("quickSignalsSubtitle")}</p>
-                </div>
-                <div className="signal-stack">
-                  {pulseReports.map((report) => (
-                    <article className="signal-card" key={report.id}>
-                      <span className={`signal-badge severity-${report.severity.toLowerCase()}`}>
-                        {report.severity}
-                      </span>
-                      <div>
-                        <strong>{report.title}</strong>
-                        <p>
-                          {report.confirmations}x | {report.ageMinutes}m
-                        </p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
 
-              <section className="panel-card shell-card">
-                <div className="panel-header">
-                  <h2>{homeT("dashboardActionsTitle")}</h2>
-                  <p>{homeT("dashboardActionsSubtitle")}</p>
-                </div>
-                <div className="button-stack">
-                  <button
-                    className="primary-button full-width-button"
-                    type="button"
-                    onClick={() => setActiveTab("routes")}
-                  >
-                    {homeT("lastRide.repeat")}
-                  </button>
-                  <button
-                    className="ghost-button full-width-button"
-                    type="button"
-                    onClick={() => setActiveTab("social")}
-                  >
-                    {homeT("socialHub.openSocial")}
-                  </button>
-                </div>
-              </section>
-            </div>
-          </section>
+                <section className="map-sidebar-section">
+                  <div className="panel-header">
+                    <h2>{homeT("weekly.title")}</h2>
+                    <span className="status-chip accent-chip">{homeT("weekly.badge")}</span>
+                  </div>
+                  <div className="compact-stat-grid">
+                    {weeklyStats.map((stat) => (
+                      <article className="compact-stat" key={stat.label}>
+                        <span>{stat.label}</span>
+                        <strong>{stat.value}</strong>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              </>
+            ) : null}
 
-          <section className="dashboard-secondary-grid">
-            <section className="hero-panel shell-card dashboard-story-panel">
-              <div className="hero-toolbar">
-                <span className="prototype-pill">{metaLabels.prototype}</span>
-                <ModeToggle
-                  rideLabel={labels.rideMode}
-                  exploreLabel={labels.exploreMode}
-                  value={mode}
-                  onChange={setMode}
+            {activeTab === "routes" ? (
+              <>
+                <ThemeRail
+                  label={themesLabel}
+                  metricLabels={metaLabels}
+                  onSelect={setSelectedThemeId}
+                  selectedId={selectedTheme.id}
+                  themes={themeCards}
                 />
-              </div>
-              <div className="hero-copy">
-                <p className="eyebrow">{hero.eyebrow}</p>
-                <h1>{hero.title}</h1>
-                <p className="hero-subtitle">{hero.subtitle}</p>
-              </div>
-              <section className="stat-ribbon">
-                {stats.map((stat) => (
-                  <article className="stat-card" key={stat.label}>
-                    <span>{stat.label}</span>
-                    <strong>{stat.value}</strong>
-                  </article>
-                ))}
-              </section>
-            </section>
-
-            <div className="hero-stack">
-              <section className="panel-card shell-card hero-summary-card">
-                <div className="panel-header">
-                  <h2>{homeT("weekly.title")}</h2>
-                  <span className="status-chip accent-chip">{homeT("weekly.badge")}</span>
-                </div>
-                <p className="summary-copy">{homeT("weekly.subtitle")}</p>
-                <div className="summary-metrics">
-                  {weeklyStats.map((stat) => (
-                    <article className="summary-stat" key={stat.label}>
-                      <span>{stat.label}</span>
-                      <strong>{stat.value}</strong>
+                <section className="map-sidebar-section">
+                  <div className="panel-header">
+                    <h2>{homeT("routePlanner.title")}</h2>
+                    <p>{homeT("routePlanner.subtitle")}</p>
+                  </div>
+                  <div className="summary-metrics route-summary-metrics">
+                    <article className="summary-stat">
+                      <span>{metaLabels.safety}</span>
+                      <strong>{selectedTheme.safety}</strong>
                     </article>
-                  ))}
-                </div>
-              </section>
+                    <article className="summary-stat">
+                      <span>{metaLabels.distance}</span>
+                      <strong>{selectedTheme.distanceKm} km</strong>
+                    </article>
+                    <article className="summary-stat">
+                      <span>{metaLabels.elevation}</span>
+                      <strong>{selectedTheme.elevationM} m</strong>
+                    </article>
+                  </div>
+                  <div className="button-row">
+                    <button
+                      className="primary-button"
+                      type="button"
+                      onClick={() => setActiveTab("dashboard")}
+                    >
+                      {homeT("routePlanner.primary")}
+                    </button>
+                    <button
+                      className="ghost-button"
+                      type="button"
+                      onClick={() => setActiveTab("social")}
+                    >
+                      {homeT("routePlanner.secondary")}
+                    </button>
+                  </div>
+                </section>
+              </>
+            ) : null}
 
-              <section className="panel-card shell-card hero-summary-card">
-                <div className="panel-header">
-                  <h2>{homeT("lastRide.title")}</h2>
-                  <span className="status-chip">{selectedTheme.title}</span>
-                </div>
-                <p className="summary-copy">{homeT("lastRide.subtitle")}</p>
-                <div className="summary-metrics route-summary-metrics">
-                  <article className="summary-stat">
-                    <span>{metaLabels.safety}</span>
-                    <strong>{selectedTheme.safety}</strong>
-                  </article>
-                  <article className="summary-stat">
-                    <span>{metaLabels.distance}</span>
-                    <strong>{selectedTheme.distanceKm} km</strong>
-                  </article>
-                  <article className="summary-stat">
-                    <span>{metaLabels.elevation}</span>
-                    <strong>{selectedTheme.elevationM} m</strong>
-                  </article>
-                </div>
-                <div className="button-row">
-                  <button
-                    className="primary-button"
-                    type="button"
-                    onClick={() => setActiveTab("routes")}
-                  >
-                    {homeT("lastRide.repeat")}
-                  </button>
-                  <button
-                    className="secondary-button"
-                    type="button"
-                    onClick={() => setActiveTab("routes")}
-                  >
-                    {homeT("lastRide.openRoutes")}
-                  </button>
-                </div>
-              </section>
-            </div>
-          </section>
-        </>
-      ) : null}
+            {activeTab === "social" ? (
+              <>
+                <section className="map-sidebar-section">
+                  <div className="panel-header">
+                    <h2>{homeT("socialHub.title")}</h2>
+                    <p>{homeT("socialHub.subtitle")}</p>
+                  </div>
+                  <div className="summary-metrics">
+                    <article className="summary-stat">
+                      <span>{homeT("socialHub.reports")}</span>
+                      <strong>{mergedReports.length}</strong>
+                    </article>
+                    <article className="summary-stat">
+                      <span>{homeT("socialHub.meetups")}</span>
+                      <strong>{hasLoadedSharedMeetups ? sharedMeetups.length : 1}</strong>
+                    </article>
+                    <article className="summary-stat">
+                      <span>{homeT("socialHub.transit")}</span>
+                      <strong>{miscT("beta")}</strong>
+                    </article>
+                  </div>
+                </section>
 
-      {activeTab === "routes" ? (
-        <section className={`dashboard-grid tab-panel-grid ${mapIsFocused ? "map-focused" : ""}`}>
-          <MapStage
-            expanded={mapIsFocused}
-            featuredReports={pulseReports}
-            labels={labels}
-            metaLabels={metaLabels}
-            meetup={displayedMeetup}
-            mode={mode}
-            picker={activePicker}
-            places={mergedPlaces}
-            onOpenRoutes={() => setActiveTab("routes")}
-            onOpenSocial={() => setActiveTab("social")}
-            onToggleExpanded={() =>
-              setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
-            }
-            reports={mergedReports}
-            theme={selectedTheme}
-          />
+                <MeetupComposer
+                  {...meetupForm}
+                  isPickingCoordinates={isPickingMeetupCoordinates}
+                  onClearCoordinatePick={() => {
+                    setMeetupPickerCoordinates(null);
+                    setIsPickingMeetupCoordinates(false);
+                  }}
+                  onCreateMeetup={createMeetup}
+                  onStartCoordinatePick={() => {
+                    setMapWindowMode("focus");
+                    setPlacePickerCoordinates(null);
+                    setIsPickingPlaceCoordinates(false);
+                    setIsPickingMeetupCoordinates(true);
+                  }}
+                  selectedCoordinates={meetupPickerCoordinates}
+                />
 
-          <div className="dashboard-sidebar">
-            <ThemeRail
-              label={themesLabel}
-              metricLabels={metaLabels}
-              onSelect={setSelectedThemeId}
-              selectedId={selectedTheme.id}
-              themes={themeCards}
-            />
-            <section className="panel-card shell-card">
-              <div className="panel-header">
-                <h2>{homeT("routePlanner.title")}</h2>
-                <p>{homeT("routePlanner.subtitle")}</p>
-              </div>
-              <div className="summary-metrics route-summary-metrics">
-                <article className="summary-stat">
-                  <span>{metaLabels.safety}</span>
-                  <strong>{selectedTheme.safety}</strong>
-                </article>
-                <article className="summary-stat">
-                  <span>{metaLabels.distance}</span>
-                  <strong>{selectedTheme.distanceKm} km</strong>
-                </article>
-                <article className="summary-stat">
-                  <span>{metaLabels.elevation}</span>
-                  <strong>{selectedTheme.elevationM} m</strong>
-                </article>
-              </div>
-              <div className="button-row">
-                <button
-                  className="primary-button"
-                  type="button"
-                  onClick={() => setActiveTab("dashboard")}
-                >
-                  {homeT("routePlanner.primary")}
-                </button>
-                <button
-                  className="ghost-button"
-                  type="button"
-                  onClick={() => setActiveTab("social")}
-                >
-                  {homeT("routePlanner.secondary")}
-                </button>
-              </div>
-            </section>
+                <PlaceComposer
+                  {...placeForm}
+                  isPickingCoordinates={isPickingPlaceCoordinates}
+                  onClearCoordinatePick={() => {
+                    setPlacePickerCoordinates(null);
+                    setIsPickingPlaceCoordinates(false);
+                  }}
+                  onCreatePlace={createPlace}
+                  onStartCoordinatePick={() => {
+                    setMapWindowMode("focus");
+                    setMeetupPickerCoordinates(null);
+                    setIsPickingMeetupCoordinates(false);
+                    setIsPickingPlaceCoordinates(true);
+                  }}
+                  selectedCoordinates={placePickerCoordinates}
+                />
+
+                <section className="map-sidebar-section">
+                  <div className="panel-header">
+                    <h2>{homeT("socialHub.placesTitle")}</h2>
+                    <p>{homeT("socialHub.placesSubtitle")}</p>
+                  </div>
+                  <div className="signal-stack">
+                    {pulsePlaces.map((place) => (
+                      <article className="signal-card" key={place.id}>
+                        <span className={`place-badge source-${place.sourceKind}`}>
+                          {miscT(place.categoryKey)}
+                        </span>
+                        <div>
+                          <strong>{place.title}</strong>
+                          <p>{place.description}</p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+
+                <MeetupCard
+                  actionFeedbackLabels={{
+                    joined: labels.meetupJoined,
+                    maybe: labels.meetupMaybe,
+                    shared: labels.meetupShared,
+                    shareUnavailable: labels.meetupShareUnavailable
+                  }}
+                  labels={metaLabels}
+                  {...displayedMeetup}
+                />
+                <TransitRulesCard {...transit} />
+              </>
+            ) : null}
           </div>
-        </section>
-      ) : null}
+        </aside>
 
-      {activeTab === "social" ? (
-        <section className={`dashboard-grid tab-panel-grid ${mapIsFocused ? "map-focused" : ""}`}>
-          <MapStage
-            expanded={mapIsFocused}
-            featuredReports={pulseReports}
-            labels={labels}
-            metaLabels={metaLabels}
-            meetup={displayedMeetup}
-            mode={mode}
-            picker={activePicker}
-            places={mergedPlaces}
-            onOpenRoutes={() => setActiveTab("routes")}
-            onOpenSocial={() => setActiveTab("social")}
-            onToggleExpanded={() =>
-              setMapWindowMode((current) => (current === "focus" ? "split" : "focus"))
-            }
-            reports={mergedReports}
-            theme={selectedTheme}
-          />
-
-          <div className="dashboard-sidebar">
-            <section className="panel-card shell-card">
-              <div className="panel-header">
-                <h2>{homeT("socialHub.title")}</h2>
-                <p>{homeT("socialHub.subtitle")}</p>
-              </div>
-              <div className="summary-metrics">
-                <article className="summary-stat">
-                  <span>{homeT("socialHub.reports")}</span>
-                  <strong>{mergedReports.length}</strong>
-                </article>
-                <article className="summary-stat">
-                  <span>{homeT("socialHub.meetups")}</span>
-                  <strong>{hasLoadedSharedMeetups ? sharedMeetups.length : 1}</strong>
-                </article>
-                <article className="summary-stat">
-                  <span>{homeT("socialHub.transit")}</span>
-                  <strong>{miscT("beta")}</strong>
-                </article>
-              </div>
-            </section>
-
-            <MeetupComposer
-              {...meetupForm}
-              isPickingCoordinates={isPickingMeetupCoordinates}
-              onClearCoordinatePick={() => {
-                setMeetupPickerCoordinates(null);
-                setIsPickingMeetupCoordinates(false);
-              }}
-              onCreateMeetup={createMeetup}
-              onStartCoordinatePick={() => {
-                setMapWindowMode("focus");
-                setPlacePickerCoordinates(null);
-                setIsPickingPlaceCoordinates(false);
-                setIsPickingMeetupCoordinates(true);
-              }}
-              selectedCoordinates={meetupPickerCoordinates}
-            />
-
-            <PlaceComposer
-              {...placeForm}
-              isPickingCoordinates={isPickingPlaceCoordinates}
-              onClearCoordinatePick={() => {
-                setPlacePickerCoordinates(null);
-                setIsPickingPlaceCoordinates(false);
-              }}
-              onCreatePlace={createPlace}
-              onStartCoordinatePick={() => {
-                setMapWindowMode("focus");
-                setMeetupPickerCoordinates(null);
-                setIsPickingMeetupCoordinates(false);
-                setIsPickingPlaceCoordinates(true);
-              }}
-              selectedCoordinates={placePickerCoordinates}
-            />
-
-            <section className="panel-card shell-card">
-              <div className="panel-header">
-                <h2>{homeT("socialHub.placesTitle")}</h2>
-                <p>{homeT("socialHub.placesSubtitle")}</p>
-              </div>
-              <div className="signal-stack">
-                {pulsePlaces.map((place) => (
-                  <article className="signal-card" key={place.id}>
-                    <span className={`place-badge source-${place.sourceKind}`}>{miscT(place.categoryKey)}</span>
-                    <div>
-                      <strong>{place.title}</strong>
-                      <p>{place.description}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <MeetupCard
-              actionFeedbackLabels={{
-                joined: labels.meetupJoined,
-                maybe: labels.meetupMaybe,
-                shared: labels.meetupShared,
-                shareUnavailable: labels.meetupShareUnavailable
-              }}
-              labels={metaLabels}
-              {...displayedMeetup}
-            />
-            <TransitRulesCard {...transit} />
-          </div>
-        </section>
-      ) : null}
+        <div className="map-app-canvas">{mapStage}</div>
+      </section>
     </main>
   );
 }

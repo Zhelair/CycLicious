@@ -32,10 +32,7 @@ export async function GET() {
   const supabase = getSupabaseServerClient();
 
   if (!supabase) {
-    return NextResponse.json(
-      {error: "Supabase is not configured for meetups yet."},
-      {status: 503}
-    );
+    return NextResponse.json({available: false, data: []});
   }
 
   const {data, error} = await supabase
@@ -52,6 +49,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
+    available: true,
     data: (data ?? []) as SharedMeetupRecord[]
   });
 }
